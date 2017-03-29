@@ -79,13 +79,6 @@ public class MainActivity extends Activity {
         mTasksView.setmTotalProgress(mTotalProgress);
     }
 
-    private void makeInVis(TextView myView) {
-    }
-
-    private void makeVis(View myView) {
-
-    }
-
     //暂停功能方法
     private void suspend() {
         suspended = true;
