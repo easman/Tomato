@@ -78,7 +78,6 @@ public class MainActivity extends Activity {
         button3 = (Button) findViewById(R.id.button3);
         mTasksView.setmTotalProgress(mTotalProgress);
     }
-
     //暂停功能方法
     private void suspend() {
         suspended = true;
