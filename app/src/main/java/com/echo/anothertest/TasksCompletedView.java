@@ -111,4 +111,9 @@ public class TasksCompletedView extends View {
         mProgress = progress;
         postInvalidate();
     }
+
+//    public void resetProgress(){
+//        mProgress = 0;
+//        postInvalidate();
+//    }
 }

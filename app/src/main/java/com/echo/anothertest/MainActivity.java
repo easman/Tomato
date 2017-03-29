@@ -11,9 +11,12 @@ public class MainActivity extends Activity {
 
     private TasksCompletedView mTasksView;
     private TextView tx1, tx2, txStart;
+    private Button resetButton;
     private int mTotalProgress;
     private int mCurrentProgress;
-    private boolean suspended;
+//    private boolean suspended;
+    private boolean txStartHasNotClicked;
+    private boolean firstTimeRunning;
 //    private boolean isTomato;
 //    private int TomatoTime ;
 //    private int mTotalRelaxProgress;
@@ -25,14 +28,24 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         initVariable();
         initView();
+        final TimerRunable timerRunable =new TimerRunable(mCurrentProgress,mTotalProgress,mTasksView);
 
         txStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tx1.setVisibility(View.VISIBLE);
-                txStart.setText("Tic Tok =。=");
-                suspended = false;
-                new Thread(new ProgressRunable()).start();
+                if(txStartHasNotClicked){
+                    tx2.setVisibility(View.VISIBLE);
+                    txStart.setText("Tic Tok =。=");
+                    txStartHasNotClicked = false;
+//                    suspended = false;
+                    if(firstTimeRunning){
+                        firstTimeRunning = false;
+                        new Thread(timerRunable).start();
+                    }else {
+                        timerRunable.resume();
+                    }
+
+                }
             }
         });
 
@@ -41,15 +54,15 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 tx1.setVisibility(View.INVISIBLE);
                 tx2.setVisibility(View.VISIBLE);
-                suspended = false;
-                new Thread(new ProgressRunable()).start();
+                timerRunable.resume();
+
             }
         });
 
         tx2.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                suspend();
+                timerRunable.suspend(true);
                 tx1.setVisibility(View.VISIBLE);
                 tx2.setVisibility(View.INVISIBLE);
                 return true;
@@ -65,12 +78,25 @@ public class MainActivity extends Activity {
                         tx2.setTextColor(0xFF0000FF);
                         break;
                     case MotionEvent.ACTION_UP:
-                        tx2.setText("长按取消");
+                        tx2.setText("长按暂停");
                         tx2.setTextColor(0xFFFFFFFF);
                         break;
 
                 }
                 return false;
+            }
+        });
+
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                timerRunable.suspend(true);
+                timerRunable.resetProgress();
+                txStartHasNotClicked = true;
+                txStart.setText("开始番茄");
+                tx1.setVisibility(View.INVISIBLE);
+                tx2.setVisibility(View.INVISIBLE);
+
             }
         });
 
@@ -80,9 +106,12 @@ public class MainActivity extends Activity {
     private void initVariable() {
         mTotalProgress = 10000;
         mCurrentProgress = 0;
+        txStartHasNotClicked = true;
+        firstTimeRunning= true;
     }
 
     private void initView() {
+        resetButton = (Button) findViewById(R.id.reset_button);
         mTasksView = (TasksCompletedView) findViewById(R.id.tasks_view);
         tx1 = (TextView) findViewById(R.id.tx1);
         tx2 = (TextView) findViewById(R.id.tx2);
@@ -92,40 +121,40 @@ public class MainActivity extends Activity {
         mTasksView.setmTotalProgress(mTotalProgress);
     }
 
-    //暂停功能方法
-    private void suspend() {
-        suspended = true;
-    }
+//    //暂停功能方法
+//    private void suspend() {
+//        suspended = true;
+//    }
+//
+//    //继续的方法
+//    private synchronized void resume() {
+//        suspended = false;
+//        notify();
+//    }
 
-    //继续的方法
-    private synchronized void resume() {
-        suspended = false;
-        notify();
-    }
-
-    class ProgressRunable implements Runnable {
-
-
-        @Override
-        public void run() {
-            while (mCurrentProgress < mTotalProgress) {
-                mCurrentProgress += 1;
-                mTasksView.setProgress(mCurrentProgress);
-                try {
-                    Thread.sleep(1);
-                    //检查暂停变量
-                    synchronized (this) {
-                        while (suspended) {
-                            wait();
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
-
-
-    }
+//    class ProgressRunable implements Runnable {
+//
+//
+//        @Override
+//        public void run() {
+//            while (mCurrentProgress < mTotalProgress) {
+//                mCurrentProgress += 1;
+//                mTasksView.setProgress(mCurrentProgress);
+//                try {
+//                    Thread.sleep(1);
+//                    //检查暂停变量
+//                    synchronized (this) {
+//                        while (suspended) {
+//                            wait();
+//                        }
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//        }
+//
+//
+//    }
 }
