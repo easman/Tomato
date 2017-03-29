@@ -10,11 +10,14 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 
     private TasksCompletedView mTasksView;
-    private TextView tx1, tx2;
-    private Button button2, button3;
+    private TextView tx1, tx2, txStart;
     private int mTotalProgress;
     private int mCurrentProgress;
-    private boolean suspended = false;
+    private boolean suspended;
+//    private boolean isTomato;
+//    private int TomatoTime ;
+//    private int mTotalRelaxProgress;
+//    private int getmCurrentRelaxProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +25,26 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         initVariable();
         initView();
+
+        txStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tx1.setVisibility(View.VISIBLE);
+                txStart.setText("Tic Tok =。=");
+                suspended = false;
+                new Thread(new ProgressRunable()).start();
+            }
+        });
+
+        tx1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tx1.setVisibility(View.INVISIBLE);
+                tx2.setVisibility(View.VISIBLE);
+                suspended = false;
+                new Thread(new ProgressRunable()).start();
+            }
+        });
 
         tx2.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -51,15 +74,6 @@ public class MainActivity extends Activity {
             }
         });
 
-        tx1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tx1.setVisibility(View.INVISIBLE);
-                tx2.setVisibility(View.VISIBLE);
-                suspended = false;
-                new Thread(new ProgressRunable()).start();
-            }
-        });
 
     }
 
@@ -72,12 +86,12 @@ public class MainActivity extends Activity {
         mTasksView = (TasksCompletedView) findViewById(R.id.tasks_view);
         tx1 = (TextView) findViewById(R.id.tx1);
         tx2 = (TextView) findViewById(R.id.tx2);
-        tx1.setVisibility(View.VISIBLE);
+        txStart = (TextView) findViewById(R.id.txStart);
+        tx1.setVisibility(View.INVISIBLE);
         tx2.setVisibility(View.INVISIBLE);
-        button2 = (Button) findViewById(R.id.button2);
-        button3 = (Button) findViewById(R.id.button3);
         mTasksView.setmTotalProgress(mTotalProgress);
     }
+
     //暂停功能方法
     private void suspend() {
         suspended = true;
@@ -109,6 +123,7 @@ public class MainActivity extends Activity {
                     e.printStackTrace();
                 }
             }
+
         }
 
 
