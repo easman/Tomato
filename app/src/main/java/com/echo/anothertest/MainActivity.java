@@ -3,6 +3,7 @@ package com.echo.anothertest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,9 +19,11 @@ public class MainActivity extends Activity {
 
     private static final int MSG_TIME_IS_UP = 1;
     private static final int MSG_TIME_TICK = 2;
+    private static final int MST_PRESS_BACK_BUTTON = 3;
     private static final boolean WORK_TIME_SITUATION = true;
     private static final boolean BREAK_TIME_SITUATION = false;
     private boolean currentSituation;
+    private boolean isBack;
     private TasksCompletedView mTasksView;
     private TextView tx1, tx2, txStart;
     private int mTotalProgress;
@@ -94,7 +97,17 @@ public class MainActivity extends Activity {
         });
     }
 
+    @Override
+    public void onBackPressed() {
+
+        handler.sendEmptyMessage(MST_PRESS_BACK_BUTTON);
+        if (isBack) {
+            super.onBackPressed();
+        }
+    }
+
     private void initVariable() {
+        isBack = false;
         currentTomatoTime = 0;
         currentSituation = WORK_TIME_SITUATION;
         mTotalProgress = workTime;
@@ -154,6 +167,21 @@ public class MainActivity extends Activity {
                     int second = mCurrentProgress / 1000 % 60;
                     System.out.println(minute + ":" + second);
                     //TODO 设置TextView的时间字符串
+                    break;
+                case MST_PRESS_BACK_BUTTON:
+                    stopTimer();
+                    new AlertDialog.Builder(getContext()).setMessage("你确定要结束这个番茄吗").setPositiveButton("结束番茄", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            isBack = true;
+                            //TODO 结束番茄
+                        }
+                    }).setNegativeButton("继续工作", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            startTimer();
+                        }
+                    }).show();
                     break;
             }
         }
