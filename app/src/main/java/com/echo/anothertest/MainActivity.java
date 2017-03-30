@@ -37,14 +37,12 @@ public class MainActivity extends Activity {
                     tx2.setVisibility(View.VISIBLE);
                     txStart.setText("Tic Tok =。=");
                     txStartHasNotClicked = false;
-//                    suspended = false;
                     if(firstTimeRunning){
                         firstTimeRunning = false;
                         new Thread(timerRunable).start();
                     }else {
                         timerRunable.resume();
                     }
-
                 }
             }
         });
@@ -99,8 +97,6 @@ public class MainActivity extends Activity {
 
             }
         });
-
-
     }
 
     private void initVariable() {
@@ -121,40 +117,4 @@ public class MainActivity extends Activity {
         mTasksView.setmTotalProgress(mTotalProgress);
     }
 
-//    //暂停功能方法
-//    private void suspend() {
-//        suspended = true;
-//    }
-//
-//    //继续的方法
-//    private synchronized void resume() {
-//        suspended = false;
-//        notify();
-//    }
-
-//    class ProgressRunable implements Runnable {
-//
-//
-//        @Override
-//        public void run() {
-//            while (mCurrentProgress < mTotalProgress) {
-//                mCurrentProgress += 1;
-//                mTasksView.setProgress(mCurrentProgress);
-//                try {
-//                    Thread.sleep(1);
-//                    //检查暂停变量
-//                    synchronized (this) {
-//                        while (suspended) {
-//                            wait();
-//                        }
-//                    }
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//        }
-//
-//
-//    }
 }
