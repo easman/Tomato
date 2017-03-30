@@ -41,7 +41,7 @@ public class TasksCompletedView extends View {
     private float mTxtHeight;
 
     // 总进度
-    private int mTotalProgress = 100;
+    private int mTotalProgress ;
     // 当前进度
     private int mProgress;
 
@@ -111,9 +111,4 @@ public class TasksCompletedView extends View {
         mProgress = progress;
         postInvalidate();
     }
-
-//    public void resetProgress(){
-//        mProgress = 0;
-//        postInvalidate();
-//    }
 }
