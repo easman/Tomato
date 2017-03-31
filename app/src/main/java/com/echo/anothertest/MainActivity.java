@@ -23,7 +23,7 @@ public class MainActivity extends Activity {
     private static final boolean WORK_TIME_SITUATION = true;
     private static final boolean BREAK_TIME_SITUATION = false;
     private boolean currentSituation;
-    private boolean isBack;
+    private boolean isRunning;
     private TasksCompletedView mTasksView;
     private TextView tx1, tx2, txStart;
     private int mTotalProgress;
@@ -54,6 +54,7 @@ public class MainActivity extends Activity {
                         currentTomatoTime += 0.5;
                     }
                     System.out.println("点击开始");
+                    isRunning = true;
                     startTimer();
                 }
             }
@@ -64,6 +65,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 tx1.setVisibility(View.INVISIBLE);
                 tx2.setVisibility(View.VISIBLE);
+                isRunning = true;
                 startTimer();
             }
         });
@@ -71,6 +73,7 @@ public class MainActivity extends Activity {
         tx2.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                isRunning = false;
                 stopTimer();
                 tx1.setVisibility(View.VISIBLE);
                 tx2.setVisibility(View.INVISIBLE);
@@ -99,15 +102,11 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-
         handler.sendEmptyMessage(MST_PRESS_BACK_BUTTON);
-        if (isBack) {
-            super.onBackPressed();
-        }
     }
 
     private void initVariable() {
-        isBack = false;
+        isRunning = false;
         currentTomatoTime = 0;
         currentSituation = WORK_TIME_SITUATION;
         mTotalProgress = workTime;
@@ -173,13 +172,17 @@ public class MainActivity extends Activity {
                     new AlertDialog.Builder(getContext()).setCancelable(false).setMessage("你确定要结束这个番茄吗").setPositiveButton("结束番茄", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            isBack = true;
+                            MainActivity.super.onBackPressed();
                             //TODO 结束番茄
                         }
                     }).setNegativeButton("继续工作", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            startTimer();
+                            if(isRunning){
+                                startTimer();
+                            }else {
+                                stopTimer();
+                            }
                         }
                     }).show();
                     break;
