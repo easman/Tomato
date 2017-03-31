@@ -170,7 +170,7 @@ public class MainActivity extends Activity {
                     break;
                 case MST_PRESS_BACK_BUTTON:
                     stopTimer();
-                    new AlertDialog.Builder(getContext()).setMessage("你确定要结束这个番茄吗").setPositiveButton("结束番茄", new DialogInterface.OnClickListener() {
+                    new AlertDialog.Builder(getContext()).setCancelable(false).setMessage("你确定要结束这个番茄吗").setPositiveButton("结束番茄", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             isBack = true;
