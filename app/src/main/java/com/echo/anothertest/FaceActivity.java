@@ -3,7 +3,9 @@ package com.echo.anothertest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,8 +16,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FaceActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private RecyclerView mRecyclerView;
+    private MyAdapter myAdapter;
+    private List<Tomato> tomatos = new ArrayList<Tomato>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +33,7 @@ public class FaceActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //设置右下角按钮功能
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -33,6 +43,7 @@ public class FaceActivity extends AppCompatActivity
             }
         });
 
+        //设置滑出菜单
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -41,6 +52,21 @@ public class FaceActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+        // 拿到RecyclerView
+        mRecyclerView = (RecyclerView) findViewById(R.id.tomato_list);
+        // 设置LinearLayoutManager
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        // 设置ItemAnimator
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        // 设置固定大小
+        mRecyclerView.setHasFixedSize(true);
+        // 初始化自定义的适配器
+        myAdapter = new MyAdapter(this, tomatos);
+        // 为mRecyclerView设置适配器
+        mRecyclerView.setAdapter(myAdapter);
+
     }
 
     @Override
@@ -62,15 +88,23 @@ public class FaceActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        switch(item.getItemId()){
+            case R.id.action_settings:
+                if (myAdapter.getItemCount() != 0) {
+                    tomatos.remove(myAdapter.getItemCount()-1);
+                    mRecyclerView.scrollToPosition(myAdapter.getItemCount() - 1);
+                    myAdapter.notifyDataSetChanged();
+                }
+                return true;
+            case R.id.action_settings2:
+                tomatos.add(new Tomato(25,5,4,"this is a test from faceActivity"));
+                mRecyclerView.scrollToPosition(myAdapter.getItemCount() - 1);
+                myAdapter.notifyDataSetChanged();
+                return true;
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
         }
+
+
 
         return super.onOptionsItemSelected(item);
     }

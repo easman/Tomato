@@ -30,8 +30,8 @@ public class MainActivity extends Activity {
     private int mCurrentProgress;
     private int workTime = 15000;
     private int breakTime = 8000;
-    private double currentTomatoTime;
-    private int tomatoTime = 4;
+    private double currentTomatoNumber;
+    private int tomatoNumber = 4;
     private boolean txStartHasNotClicked;
     private Timer timer = new Timer();
     private TimerTask timerTask = null;
@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
                     txStart.setText("Tic Tok =。=");
                     txStartHasNotClicked = false;
                     if (currentSituation == WORK_TIME_SITUATION) {
-                        currentTomatoTime += 0.5;
+                        currentTomatoNumber += 0.5;
                     }
                     System.out.println("点击开始");
                     isRunning = true;
@@ -107,7 +107,7 @@ public class MainActivity extends Activity {
 
     private void initVariable() {
         isRunning = false;
-        currentTomatoTime = 0;
+        currentTomatoNumber = 0;
         currentSituation = WORK_TIME_SITUATION;
         mTotalProgress = workTime;
         mCurrentProgress = 0;
@@ -192,9 +192,9 @@ public class MainActivity extends Activity {
 
     private void timeIsUpEvent() {
         if (currentSituation == WORK_TIME_SITUATION) {   //判断当前执行的是工作还是休息状态
-            currentTomatoTime += 0.5;
-            System.out.println(currentTomatoTime);
-            if (currentTomatoTime == tomatoTime) {       //判断是否已经完成番茄
+            currentTomatoNumber += 0.5;
+            System.out.println(currentTomatoNumber);
+            if (currentTomatoNumber == tomatoNumber) {       //判断是否已经完成番茄
 
                 //TODO 结束番茄
             } else {
