@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.Timer;
@@ -24,15 +23,15 @@ public class MainActivity extends Activity {
     private static final boolean BREAK_TIME_SITUATION = false;
     private boolean currentSituation;
     private boolean isRunning;
-    private TasksCompletedView mTasksView;
-    private TextView tx1, tx2, txStart;
+    private boolean txStartHasNotClicked;
     private int mTotalProgress;
     private int mCurrentProgress;
-    private int workTime = 15000;
-    private int breakTime = 8000;
+    private int workMinutes;
+    private int breakMinutes;
+    private int totleTamatoTime;
     private double currentTomatoNumber;
-    private int tomatoNumber = 4;
-    private boolean txStartHasNotClicked;
+    private TasksCompletedView mTasksView;
+    private TextView tx1, tx2, txStart;
     private Timer timer = new Timer();
     private TimerTask timerTask = null;
 
@@ -53,7 +52,6 @@ public class MainActivity extends Activity {
                     if (currentSituation == WORK_TIME_SITUATION) {
                         currentTomatoNumber += 0.5;
                     }
-                    System.out.println("点击开始");
                     isRunning = true;
                     startTimer();
                 }
@@ -106,10 +104,13 @@ public class MainActivity extends Activity {
     }
 
     private void initVariable() {
+        workMinutes = 15000;
+        breakMinutes = 8000;
+        totleTamatoTime = 4;
         isRunning = false;
         currentTomatoNumber = 0;
         currentSituation = WORK_TIME_SITUATION;
-        mTotalProgress = workTime;
+        mTotalProgress = workMinutes;
         mCurrentProgress = 0;
         txStartHasNotClicked = true;
     }
@@ -194,12 +195,12 @@ public class MainActivity extends Activity {
         if (currentSituation == WORK_TIME_SITUATION) {   //判断当前执行的是工作还是休息状态
             currentTomatoNumber += 0.5;
             System.out.println(currentTomatoNumber);
-            if (currentTomatoNumber == tomatoNumber) {       //判断是否已经完成番茄
+            if (currentTomatoNumber == totleTamatoTime) {       //判断是否已经完成番茄
 
                 //TODO 结束番茄
             } else {
                 currentSituation = BREAK_TIME_SITUATION;
-                mTotalProgress = breakTime;
+                mTotalProgress = breakMinutes;
                 mTasksView.setmTotalProgress(mTotalProgress);
                 mCurrentProgress = 0;
                 txStart.setText("休息一下");
@@ -207,7 +208,7 @@ public class MainActivity extends Activity {
             }
         } else if (currentSituation == BREAK_TIME_SITUATION) {
             currentSituation = WORK_TIME_SITUATION;
-            mTotalProgress = workTime;
+            mTotalProgress = workMinutes;
             mTasksView.setmTotalProgress(mTotalProgress);
             mCurrentProgress = 0;
             txStart.setText("Tic Tok =。=");

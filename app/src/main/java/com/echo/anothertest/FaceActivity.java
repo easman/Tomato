@@ -18,6 +18,7 @@ import android.view.MenuItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class FaceActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -66,7 +67,6 @@ public class FaceActivity extends AppCompatActivity
         myAdapter = new MyAdapter(this, tomatos);
         // 为mRecyclerView设置适配器
         mRecyclerView.setAdapter(myAdapter);
-
     }
 
     @Override
@@ -88,6 +88,7 @@ public class FaceActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        String[] someTestItem = new String[]{"跑步","学钢琴","看电视","玩游戏","学python","练字","上自习","读英语","练习街舞","聊天"};
         switch(item.getItemId()){
             case R.id.action_settings:
                 if (myAdapter.getItemCount() != 0) {
@@ -97,7 +98,9 @@ public class FaceActivity extends AppCompatActivity
                 }
                 return true;
             case R.id.action_settings2:
-                tomatos.add(new Tomato(25,5,4,"this is a test from faceActivity"));
+                Random random = new Random();
+                int a = random.nextInt(10);
+                tomatos.add(new Tomato(25,5,4,someTestItem[a]));
                 mRecyclerView.scrollToPosition(myAdapter.getItemCount() - 1);
                 myAdapter.notifyDataSetChanged();
                 return true;
