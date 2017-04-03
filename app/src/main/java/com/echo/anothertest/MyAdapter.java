@@ -19,7 +19,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     private List<Tomato> tomatos;
     private Context mContext;
 
-    public MyAdapter(Context context, List<Tomato> tomatos){
+    public MyAdapter(Context context, List<Tomato> tomatos) {
         this.mContext = context;
         this.tomatos = tomatos;
     }
@@ -46,16 +46,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     }
 
 
-
-
     // 重写的自定义ViewHolder
-    public static class ViewHolder
-            extends RecyclerView.ViewHolder
-    {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView mTextView;
-
-        public ViewHolder( View v )
-        {
+        public ViewHolder(View v) {
             super(v);
             mTextView = (TextView) v.findViewById(R.id.job_decription);
         }

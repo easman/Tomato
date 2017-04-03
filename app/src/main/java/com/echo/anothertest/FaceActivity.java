@@ -1,6 +1,8 @@
 package com.echo.anothertest;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -67,19 +69,43 @@ public class FaceActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        // 拿到RecyclerView
-        mRecyclerView = (RecyclerView) findViewById(R.id.tomato_list);
-        // 设置LinearLayoutManager
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        // 设置ItemAnimator
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        // 设置固定大小
-        mRecyclerView.setHasFixedSize(true);
-        // 初始化自定义的适配器
-        myAdapter = new MyAdapter(this, tomatos);
-        // 为mRecyclerView设置适配器
-        mRecyclerView.setAdapter(myAdapter);
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.tomato_list);       // 拿到RecyclerView
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));       // 设置LinearLayoutManager
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());            // 设置ItemAnimator
+        mRecyclerView.setHasFixedSize(true);                                 // 设置固定大小
+        myAdapter = new MyAdapter(this, tomatos);                            // 初始化自定义的适配器
+        mRecyclerView.setAdapter(myAdapter);                                 // 为mRecyclerView设置适配器
         readSavedTomatoList();
+
+        //设置点击番茄卡片事件
+        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+
+            }
+
+            @Override
+            public void onItemLongClick(View view, final int position) {
+                new AlertDialog.Builder(FaceActivity.this).setTitle("操作选项").setItems(new CharSequence[]{"删除"}, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case 0:
+                                tomatos.remove(position);
+                                saveTomatoList();
+                                mRecyclerView.scrollToPosition(position);
+                                myAdapter.notifyDataSetChanged();
+                                break;
+                            default:
+                                break;
+                        }
+
+                    }
+                }).setNegativeButton("取消",null).show();
+            }
+        }));
+
     }
 
     @Override
@@ -153,17 +179,20 @@ public class FaceActivity extends AppCompatActivity
     //存储数据
 
     private void saveTomatoList() {
-        //使用类名来命名SharedPreferences
         SharedPreferences.Editor editor = getSharedPreferences(FaceActivity.class.getName(), Context.MODE_PRIVATE).edit();
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < myAdapter.getItemCount(); i++) {
-            sb.append(setTomatoToShare(tomatos.get(i))).append(",");
+        if (myAdapter.getItemCount() != 0) {
+            //使用类名来命名SharedPreferences
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < myAdapter.getItemCount(); i++) {
+                sb.append(setTomatoToShare(tomatos.get(i))).append(",");
+            }
+            String content = sb.toString().substring(0, sb.length() - 1);
+            editor.putString(getString(R.string.alarm_list), content);
+            editor.commit();
+        }else {
+            editor.clear();
+            editor.commit();
         }
-
-        String content = sb.toString().substring(0,sb.length()-1);
-        editor.putString(getString(R.string.alarm_list),content);
-
-        editor.commit();
     }
 
     //读取数据
