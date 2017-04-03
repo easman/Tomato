@@ -195,7 +195,7 @@ public class MainActivity extends Activity {
         if (currentSituation == WORK_TIME_SITUATION) {   //判断当前执行的是工作还是休息状态
             currentTomatoNumber += 0.5;
             System.out.println(currentTomatoNumber);
-            if (currentTomatoNumber == totleTamatoTime) {       //判断是否已经完成番茄
+            if (totleTamatoTime == (int) currentTomatoNumber) {       //判断是否已经完成番茄
 
                 //TODO 结束番茄
             } else {
