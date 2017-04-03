@@ -1,10 +1,12 @@
 package com.echo.anothertest;
 
+import java.io.Serializable;
+
 /**
- * Created by Echo on 2017/4/2.
+ * Created by Echo
  */
 
-public class Tomato {
+public class Tomato implements Serializable {
     private int workMinutes;
     private int breakMinutes;
     private int totleTamatoTime;

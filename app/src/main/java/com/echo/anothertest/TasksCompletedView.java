@@ -9,7 +9,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 /**
- * Created by Echo on 2017/3/29.
+ * Created by Echo
  */
 
 public class TasksCompletedView extends View {

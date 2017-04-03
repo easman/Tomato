@@ -14,6 +14,10 @@ import android.widget.TextView;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Created by Echo
+ */
+
 public class MainActivity extends Activity {
 
     private static final int MSG_TIME_IS_UP = 1;
@@ -28,7 +32,7 @@ public class MainActivity extends Activity {
     private int mCurrentProgress;
     private int workMinutes;
     private int breakMinutes;
-    private int totleTamatoTime;
+    private int totleTomatoTime;
     private double currentTomatoNumber;
     private TasksCompletedView mTasksView;
     private TextView tx1, tx2, txStart;
@@ -106,7 +110,7 @@ public class MainActivity extends Activity {
     private void initVariable() {
         workMinutes = 15000;
         breakMinutes = 8000;
-        totleTamatoTime = 4;
+        totleTomatoTime = 4;
         isRunning = false;
         currentTomatoNumber = 0;
         currentSituation = WORK_TIME_SITUATION;
@@ -195,7 +199,7 @@ public class MainActivity extends Activity {
         if (currentSituation == WORK_TIME_SITUATION) {   //判断当前执行的是工作还是休息状态
             currentTomatoNumber += 0.5;
             System.out.println(currentTomatoNumber);
-            if (totleTamatoTime == (int) currentTomatoNumber) {       //判断是否已经完成番茄
+            if (totleTomatoTime == (int) currentTomatoNumber) {       //判断是否已经完成番茄
 
                 //TODO 结束番茄
             } else {

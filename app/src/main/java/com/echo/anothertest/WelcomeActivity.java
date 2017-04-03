@@ -9,7 +9,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 /**
- * Created by Echo on 2017/3/27.
+ * Created by Echo
  */
 
 public class WelcomeActivity extends Activity {

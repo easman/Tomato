@@ -1,11 +1,14 @@
 package com.echo.anothertest;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -16,9 +19,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+/**
+ * Created by Echo
+ */
 
 public class FaceActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -67,6 +79,7 @@ public class FaceActivity extends AppCompatActivity
         myAdapter = new MyAdapter(this, tomatos);
         // 为mRecyclerView设置适配器
         mRecyclerView.setAdapter(myAdapter);
+        readSavedTomatoList();
     }
 
     @Override
@@ -88,11 +101,12 @@ public class FaceActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String[] someTestItem = new String[]{"跑步","学钢琴","看电视","玩游戏","学python","练字","上自习","读英语","练习街舞","聊天"};
-        switch(item.getItemId()){
+        String[] someTestItem = new String[]{"跑步", "学钢琴", "看电视", "玩游戏", "学python", "练字", "上自习", "读英语", "练习街舞", "聊天"};
+        switch (item.getItemId()) {
             case R.id.action_settings:
                 if (myAdapter.getItemCount() != 0) {
-                    tomatos.remove(myAdapter.getItemCount()-1);
+                    tomatos.remove(myAdapter.getItemCount() - 1);
+                    saveTomatoList();
                     mRecyclerView.scrollToPosition(myAdapter.getItemCount() - 1);
                     myAdapter.notifyDataSetChanged();
                 }
@@ -100,7 +114,9 @@ public class FaceActivity extends AppCompatActivity
             case R.id.action_settings2:
                 Random random = new Random();
                 int a = random.nextInt(10);
-                tomatos.add(new Tomato(25,5,4,someTestItem[a]));
+                Tomato currentTomato = new Tomato(25, 5, 4, someTestItem[a]);
+                tomatos.add(currentTomato);
+                saveTomatoList();
                 mRecyclerView.scrollToPosition(myAdapter.getItemCount() - 1);
                 myAdapter.notifyDataSetChanged();
                 return true;
@@ -132,5 +148,79 @@ public class FaceActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    //存储数据
+
+    private void saveTomatoList() {
+        //使用类名来命名SharedPreferences
+        SharedPreferences.Editor editor = getSharedPreferences(FaceActivity.class.getName(), Context.MODE_PRIVATE).edit();
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < myAdapter.getItemCount(); i++) {
+            sb.append(setTomatoToShare(tomatos.get(i))).append(",");
+        }
+
+        String content = sb.toString().substring(0,sb.length()-1);
+        editor.putString(getString(R.string.alarm_list),content);
+
+        editor.commit();
+    }
+
+    //读取数据
+    private void readSavedTomatoList(){
+        SharedPreferences sp = getSharedPreferences(FaceActivity.class.getName(),Context.MODE_PRIVATE);
+        String content = sp.getString(getString(R.string.alarm_list),null);
+
+        if (content!= null){
+            String[] tomatoStrings = content.split(",");
+            for (String string :
+                    tomatoStrings) {
+
+                tomatos.add(getTomatoFromShare(string));
+            }
+        }
+    }
+
+    //序列化Tomato的方法
+    private String setTomatoToShare(Tomato tomato) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = null;
+        try {
+            oos = new ObjectOutputStream(baos);
+            oos.writeObject(tomato);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String tomatoStr = new String(Base64.encode(baos.toByteArray(),
+                Base64.DEFAULT));
+        try {
+            baos.close();
+            oos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return tomatoStr;
+    }
+
+    //反序列化Tomato的方法
+    private Tomato getTomatoFromShare(String tomatoBase64){
+        try {
+            // 将base64格式字符串还原成byte数组
+            if (tomatoBase64 == null || tomatoBase64.equals("")) { // 不可少，否则在下面会报java.io.StreamCorruptedException
+                return null;
+            }
+            byte[] tomatoBytes = Base64.decode(tomatoBase64.getBytes(),
+                    Base64.DEFAULT);
+            ByteArrayInputStream bais = new ByteArrayInputStream(tomatoBytes);
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            // 将byte数组转换成Tomato对象
+            Object tomato = ois.readObject();
+            bais.close();
+            ois.close();
+            return (Tomato) tomato;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
