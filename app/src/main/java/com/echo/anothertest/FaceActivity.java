@@ -53,8 +53,7 @@ public class FaceActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(FaceActivity.this, MainActivity.class);
-                startActivity(intent);
+                //TODO
             }
         });
 
@@ -69,7 +68,6 @@ public class FaceActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-
         mRecyclerView = (RecyclerView) findViewById(R.id.tomato_list);       // 拿到RecyclerView
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));       // 设置LinearLayoutManager
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());            // 设置ItemAnimator
@@ -81,8 +79,22 @@ public class FaceActivity extends AppCompatActivity
         //设置点击番茄卡片事件
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
-            public void onItemClick(View view, int position) {
-
+            public void onItemClick(View view, final int position) {
+                new AlertDialog.Builder(FaceActivity.this).setTitle("操作选项").setItems(new CharSequence[]{"开始番茄"}, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                String tomatoString = SerializableHelper.setTomatoToShare(tomatos.get(position));
+                                Intent intent = new Intent(FaceActivity.this, MainActivity.class);
+                                intent.putExtra("tomato", tomatoString);
+                                startActivityForResult(intent, position); //使用位置作为结果码，便于结束后更新数据
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }).setNegativeButton("取消", null).show();
             }
 
             @Override
@@ -90,7 +102,7 @@ public class FaceActivity extends AppCompatActivity
                 new AlertDialog.Builder(FaceActivity.this).setTitle("操作选项").setItems(new CharSequence[]{"删除"}, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
+                        switch (which) {
                             case 0:
                                 tomatos.remove(position);
                                 saveTomatoList();
@@ -102,7 +114,7 @@ public class FaceActivity extends AppCompatActivity
                         }
 
                     }
-                }).setNegativeButton("取消",null).show();
+                }).setNegativeButton("取消", null).show();
             }
         }));
 
@@ -119,6 +131,18 @@ public class FaceActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (resultCode == RESULT_OK) {
+            Tomato tomato = SerializableHelper.getTomatoFromShare(intent.getStringExtra("tomato_back")); //反序列化tomato结果
+            tomatos.set(requestCode, tomato);
+            saveTomatoList();
+            myAdapter.notifyDataSetChanged();
+        }
+//        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.face, menu);
@@ -129,9 +153,9 @@ public class FaceActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
 
         String[] someTestItem = new String[]{"跑步", "学钢琴", "看电视", "玩游戏", "学python", "练字", "上自习", "读英语", "练习街舞", "聊天"};
-        int[] someTestWorkTime = new int[]{1,2,3,4,5,6,7,8,9,10};
-        int[] someTestBreakTime = new int[]{1,2,3,4,1,2,3,4,1,2};
-        int[] sometotleTamato = new int[]{1,1,1,2,2,2,3,3,3,4};
+        int[] someTestWorkTime = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        int[] someTestBreakTime = new int[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2};
+        int[] sometotleTamato = new int[]{1, 1, 1, 2, 2, 2, 3, 3, 3, 4};
 
         switch (item.getItemId()) {
             case R.id.action_settings:
@@ -193,18 +217,18 @@ public class FaceActivity extends AppCompatActivity
             String content = sb.toString().substring(0, sb.length() - 1);
             editor.putString(getString(R.string.alarm_list), content);
             editor.commit();
-        }else {
+        } else {
             editor.clear();
             editor.commit();
         }
     }
 
     //读取数据
-    private void readSavedTomatoList(){
-        SharedPreferences sp = getSharedPreferences(FaceActivity.class.getName(),Context.MODE_PRIVATE);
-        String content = sp.getString(getString(R.string.alarm_list),null);
+    private void readSavedTomatoList() {
+        SharedPreferences sp = getSharedPreferences(FaceActivity.class.getName(), Context.MODE_PRIVATE);
+        String content = sp.getString(getString(R.string.alarm_list), null);
 
-        if (content!= null){
+        if (content != null) {
             String[] tomatoStrings = content.split(",");
             for (String string :
                     tomatoStrings) {

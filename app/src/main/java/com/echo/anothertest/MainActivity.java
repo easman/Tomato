@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -27,16 +28,19 @@ public class MainActivity extends Activity {
     private static final boolean WORK_TIME_SITUATION = true;
     private static final boolean BREAK_TIME_SITUATION = false;
 
-    private int mTotalProgress;
-    private int mCurrentProgress;
-
+    //载入数据参数
+    private Tomato tomato;
     private int workMinutes;
     private int breakMinutes;
     private int totleTomatoRepeat;
+    private int numberOfFinish;
+    private int numberOfUnfinish;
     private String jobDescription;
-    private int NumberOfFinish;
-    private int NumberOfUnfinish;
 
+
+    //运行中调用参数
+    private int mTotalProgress;
+    private int mCurrentProgress;
     private double currentTomatoNumber;
     private boolean currentSituation;
     private boolean isRunning;
@@ -53,16 +57,27 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initVariable();
+
+        //提取intent中的tomato对象
+        Intent intent = getIntent();
+        String tomatoString = intent.getStringExtra("tomato");
+        tomato = SerializableHelper.getTomatoFromShare(tomatoString);
+
+        //初始化
+        initVariable(tomato);
         initView();
+
+        //数据格式化
         DecimalFormat df = new DecimalFormat();
         df.applyPattern("00");
+
+        //设置txStart监听器
         txStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (txStartHasNotClicked) {
                     tx2.setVisibility(View.VISIBLE);
-                    txStart.setText("Tic Tok =。=");
+                    txStart.setText(jobDescription);
                     txStartHasNotClicked = false;
                     isRunning = true;
                     startTimer();
@@ -70,6 +85,7 @@ public class MainActivity extends Activity {
             }
         });
 
+        //设置继续按钮监听器
         tx1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,6 +96,7 @@ public class MainActivity extends Activity {
             }
         });
 
+        //设置暂停按钮长按监听器
         tx2.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -91,6 +108,7 @@ public class MainActivity extends Activity {
             }
         });
 
+        //设置暂停按钮长按效果
         tx2.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -110,16 +128,25 @@ public class MainActivity extends Activity {
         });
     }
 
+    /*
+    重写onBackPressed，更改返回键功能
+     */
     @Override
     public void onBackPressed() {
         handler.sendEmptyMessage(MST_PRESS_BACK_BUTTON);
     }
 
-    private void initVariable() {
-        workMinutes = 10000;
-        breakMinutes = 5000;
-        totleTomatoRepeat = 3;
-        jobDescription = "运动";
+    /*
+    数据初始化方法
+     */
+    private void initVariable(Tomato tomato) {
+        workMinutes = tomato.getWorkMinutes()*1000*60;
+        breakMinutes = tomato.getBreakMinutes()*1000*60;
+        totleTomatoRepeat = tomato.getTotleTamatoRepeat();
+        jobDescription = tomato.getJobDescription();
+        numberOfFinish = tomato.getNumberOfFinish();
+        numberOfUnfinish = tomato.getNumberOfUnfinish();
+
         isRunning = false;
         currentTomatoNumber = 0;
         currentSituation = WORK_TIME_SITUATION;
@@ -128,6 +155,9 @@ public class MainActivity extends Activity {
         txStartHasNotClicked = true;
     }
 
+    /*
+    布局初始化方法
+     */
     private void initView() {
         mTasksView = (TasksCompletedView) findViewById(R.id.tasks_view);
         tx1 = (TextView) findViewById(R.id.tx1);
@@ -138,12 +168,19 @@ public class MainActivity extends Activity {
 
         tx1.setVisibility(View.INVISIBLE);
         tx2.setVisibility(View.INVISIBLE);
+
+        //番茄执行进度
         txNumber.setText((int) (currentTomatoNumber + 1) + "个番茄/" + totleTomatoRepeat + "个番茄");
+
+        //倒计时显示
         df.applyPattern("00");
-        txCounter.setText((mTotalProgress-mCurrentProgress) / 1000 / 60 + ":" + df.format((mTotalProgress-mCurrentProgress) / 1000 % 60));
+        txCounter.setText((mTotalProgress - mCurrentProgress) / 1000 / 60 + ":" + df.format((mTotalProgress - mCurrentProgress) / 1000 % 60));
         mTasksView.setmTotalProgress(mTotalProgress);
     }
 
+    /*
+    开启计时器方法
+     */
     public void startTimer() {
         if (timerTask == null) {
             timerTask = new TimerTask() {
@@ -157,6 +194,7 @@ public class MainActivity extends Activity {
                     if (mCurrentProgress >= mTotalProgress) {
                         handler.sendEmptyMessage(MSG_TIME_IS_UP);
                         stopTimer();
+//                        endTomato();
                     }
 
                 }
@@ -166,6 +204,9 @@ public class MainActivity extends Activity {
         }
     }
 
+    /*
+    停止计时器方法
+     */
     private void stopTimer() {
         if (timerTask != null) {
             timerTask.cancel();
@@ -173,27 +214,28 @@ public class MainActivity extends Activity {
         }
     }
 
+    /*
+    使用Handler进行UI更新
+     */
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_TIME_IS_UP:
-                    new AlertDialog.Builder(getContext()).setTitle("Time is up").setMessage("Time is up").setNegativeButton("Cancle", null).show();   //getContext????
+//                    new AlertDialog.Builder(getContext()).setTitle("Time is up").setMessage("Time is up").setNegativeButton("Cancle", null).show();   //getContext????
                     timeIsUpEvent();
                     break;
                 case MSG_TIME_TICK:
-                    int minute = (mTotalProgress-mCurrentProgress) / 1000 / 60;
-                    int second =(mTotalProgress-mCurrentProgress) / 1000 % 60;
-                    System.out.println(minute + ":" + df.format(second));
+                    int minute = (mTotalProgress - mCurrentProgress) / 1000 / 60;
+                    int second = (mTotalProgress - mCurrentProgress) / 1000 % 60;
                     txCounter.setText(minute + ":" + df.format(second));
                     break;
                 case MST_PRESS_BACK_BUTTON:
                     stopTimer();
-                    new AlertDialog.Builder(getContext()).setCancelable(false).setMessage("你确定要结束这个番茄吗").setPositiveButton("结束番茄", new DialogInterface.OnClickListener() {
+                    new AlertDialog.Builder(MainActivity.this).setCancelable(false).setMessage("你确定要结束这个番茄吗").setPositiveButton("结束番茄", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            MainActivity.super.onBackPressed();
-                            //TODO 结束番茄
+                            endTomato();
                         }
                     }).setNegativeButton("继续工作", new DialogInterface.OnClickListener() {
                         @Override
@@ -210,14 +252,15 @@ public class MainActivity extends Activity {
         }
     };
 
+    /*
+    工作完成或休息完成时的处理方法
+     */
     private void timeIsUpEvent() {
         currentTomatoNumber += 0.5;
         if (currentSituation == WORK_TIME_SITUATION) {   //判断当前执行的是工作还是休息状态
             txNumber.setText((int) (currentTomatoNumber + 1) + "个番茄/" + totleTomatoRepeat + "个番茄");
-            System.out.println(currentTomatoNumber + " and " + (int) currentTomatoNumber);
-            if (totleTomatoRepeat-1 == (int) currentTomatoNumber) {       //判断是否已经完成番茄
-
-                //TODO 结束番茄
+            if (totleTomatoRepeat - 1 == (int) currentTomatoNumber) {       //判断是否已经完成番茄
+                endTomato();
             } else {
                 currentSituation = BREAK_TIME_SITUATION;
                 mTotalProgress = breakMinutes;
@@ -228,16 +271,34 @@ public class MainActivity extends Activity {
             }
         } else if (currentSituation == BREAK_TIME_SITUATION) {
             txNumber.setText((int) (currentTomatoNumber + 1) + "个番茄/" + totleTomatoRepeat + "个番茄");
-            System.out.println(currentTomatoNumber + " and " + (int) currentTomatoNumber);
             currentSituation = WORK_TIME_SITUATION;
             mTotalProgress = workMinutes;
             mTasksView.setmTotalProgress(mTotalProgress);
             mCurrentProgress = 0;
             txStart.setText("Tic Tok =。=");
             startTimer();
-
         }
-        //TODO 完成切换或者其他结束时应该完成的项目
+    }
+
+    /*
+    番茄终止时的处理方法
+     */
+    private void endTomato(){
+        //对tomato对象标记完成状况
+        if (currentTomatoNumber==(double) totleTomatoRepeat-0.5){
+            numberOfFinish++;
+            tomato.setNumberOfFinish(numberOfFinish);
+        }else {
+            numberOfUnfinish++;
+            tomato.setNumberOfUnfinish(numberOfUnfinish);
+        }
+        //序列化tomato对象
+        String tomatoString = SerializableHelper.setTomatoToShare(tomato);
+        Intent intent = new Intent();
+        intent.putExtra("tomato_back", tomatoString);
+        //通过Intent对象返回结果，调用setResult方法
+        setResult(RESULT_OK,intent);
+        finish();//结束当前的activity的生命周期
     }
 
     private Context getContext() {
