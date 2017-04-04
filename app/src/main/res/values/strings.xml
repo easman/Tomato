@@ -87,4 +87,16 @@
     <string name="start_tomato">开始番茄</string>
     <string name="alarm_list">alarmList</string>
     <string name="input_hint">请输入八个字以内</string>
+    <string name="jopDescriptionCN">任务名称</string>
+    <string name="useDefaultSettingCN">使用默认设置</string>
+    <string name="creatCN">创建</string>
+    <string name="workMinutesCN">番茄时长</string>
+    <string name="defaultWorkMinutesNumber">25</string>
+    <string name="minutesCN">分钟</string>
+    <string name="breakMinutesCN">休息时长</string>
+    <string name="defaultBreakMinutesNumber">5</string>
+    <string name="tomatoRepeatCN">番茄个数</string>
+    <string name="defaultTomatoRepeatNumber">4个</string>
+    <string name="soundCN">声音</string>
+    <string name="waveCN">震动</string>
 </resources>
