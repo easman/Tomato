@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -25,19 +26,27 @@ public class MainActivity extends Activity {
     private static final int MST_PRESS_BACK_BUTTON = 3;
     private static final boolean WORK_TIME_SITUATION = true;
     private static final boolean BREAK_TIME_SITUATION = false;
+
+    private int mTotalProgress;
+    private int mCurrentProgress;
+
+    private int workMinutes;
+    private int breakMinutes;
+    private int totleTomatoRepeat;
+    private String jobDescription;
+    private int NumberOfFinish;
+    private int NumberOfUnfinish;
+
+    private double currentTomatoNumber;
     private boolean currentSituation;
     private boolean isRunning;
     private boolean txStartHasNotClicked;
-    private int mTotalProgress;
-    private int mCurrentProgress;
-    private int workMinutes;
-    private int breakMinutes;
-    private int totleTomatoTime;
-    private double currentTomatoNumber;
+
     private TasksCompletedView mTasksView;
-    private TextView tx1, tx2, txStart;
+    private TextView tx1, tx2, txStart, txNumber, txCounter;
     private Timer timer = new Timer();
     private TimerTask timerTask = null;
+    private DecimalFormat df = new DecimalFormat();
 
 
     @Override
@@ -46,6 +55,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         initVariable();
         initView();
+        DecimalFormat df = new DecimalFormat();
+        df.applyPattern("00");
         txStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -53,9 +64,6 @@ public class MainActivity extends Activity {
                     tx2.setVisibility(View.VISIBLE);
                     txStart.setText("Tic Tok =。=");
                     txStartHasNotClicked = false;
-                    if (currentSituation == WORK_TIME_SITUATION) {
-                        currentTomatoNumber += 0.5;
-                    }
                     isRunning = true;
                     startTimer();
                 }
@@ -108,9 +116,10 @@ public class MainActivity extends Activity {
     }
 
     private void initVariable() {
-        workMinutes = 15000;
-        breakMinutes = 8000;
-        totleTomatoTime = 4;
+        workMinutes = 10000;
+        breakMinutes = 5000;
+        totleTomatoRepeat = 3;
+        jobDescription = "运动";
         isRunning = false;
         currentTomatoNumber = 0;
         currentSituation = WORK_TIME_SITUATION;
@@ -124,8 +133,14 @@ public class MainActivity extends Activity {
         tx1 = (TextView) findViewById(R.id.tx1);
         tx2 = (TextView) findViewById(R.id.tx2);
         txStart = (TextView) findViewById(R.id.txStart);
+        txNumber = (TextView) findViewById(R.id.txNumber);
+        txCounter = (TextView) findViewById(R.id.txCounter);
+
         tx1.setVisibility(View.INVISIBLE);
         tx2.setVisibility(View.INVISIBLE);
+        txNumber.setText((int) (currentTomatoNumber + 1) + "个番茄/" + totleTomatoRepeat + "个番茄");
+        df.applyPattern("00");
+        txCounter.setText((mTotalProgress-mCurrentProgress) / 1000 / 60 + ":" + df.format((mTotalProgress-mCurrentProgress) / 1000 % 60));
         mTasksView.setmTotalProgress(mTotalProgress);
     }
 
@@ -167,10 +182,10 @@ public class MainActivity extends Activity {
                     timeIsUpEvent();
                     break;
                 case MSG_TIME_TICK:
-                    int minute = mCurrentProgress / 1000 / 60;
-                    int second = mCurrentProgress / 1000 % 60;
-                    System.out.println(minute + ":" + second);
-                    //TODO 设置TextView的时间字符串
+                    int minute = (mTotalProgress-mCurrentProgress) / 1000 / 60;
+                    int second =(mTotalProgress-mCurrentProgress) / 1000 % 60;
+                    System.out.println(minute + ":" + df.format(second));
+                    txCounter.setText(minute + ":" + df.format(second));
                     break;
                 case MST_PRESS_BACK_BUTTON:
                     stopTimer();
@@ -183,9 +198,9 @@ public class MainActivity extends Activity {
                     }).setNegativeButton("继续工作", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            if(isRunning){
+                            if (isRunning) {
                                 startTimer();
-                            }else {
+                            } else {
                                 stopTimer();
                             }
                         }
@@ -196,10 +211,11 @@ public class MainActivity extends Activity {
     };
 
     private void timeIsUpEvent() {
+        currentTomatoNumber += 0.5;
         if (currentSituation == WORK_TIME_SITUATION) {   //判断当前执行的是工作还是休息状态
-            currentTomatoNumber += 0.5;
-            System.out.println(currentTomatoNumber);
-            if (totleTomatoTime == (int) currentTomatoNumber) {       //判断是否已经完成番茄
+            txNumber.setText((int) (currentTomatoNumber + 1) + "个番茄/" + totleTomatoRepeat + "个番茄");
+            System.out.println(currentTomatoNumber + " and " + (int) currentTomatoNumber);
+            if (totleTomatoRepeat-1 == (int) currentTomatoNumber) {       //判断是否已经完成番茄
 
                 //TODO 结束番茄
             } else {
@@ -211,6 +227,8 @@ public class MainActivity extends Activity {
                 startTimer();
             }
         } else if (currentSituation == BREAK_TIME_SITUATION) {
+            txNumber.setText((int) (currentTomatoNumber + 1) + "个番茄/" + totleTomatoRepeat + "个番茄");
+            System.out.println(currentTomatoNumber + " and " + (int) currentTomatoNumber);
             currentSituation = WORK_TIME_SITUATION;
             mTotalProgress = workMinutes;
             mTasksView.setmTotalProgress(mTotalProgress);

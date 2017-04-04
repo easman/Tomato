@@ -24,7 +24,7 @@
             android:background="#f2f2f2">
 
             <TextView
-                android:id="@+id/card_work_time"
+                android:id="@+id/card_work_minutes"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="3dp"
@@ -35,7 +35,7 @@
                 android:textSize="12sp" />
 
             <TextView
-                android:id="@+id/card_break_time"
+                android:id="@+id/card_break_minutes"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="3dp"
@@ -46,7 +46,7 @@
                 android:textSize="12sp" />
 
             <TextView
-                android:id="@+id/card_totle_tomato_time"
+                android:id="@+id/card_totle_tomato_repeat"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="3dp"
@@ -82,6 +82,34 @@
                 android:paddingStart="20dp"
                 android:text="here it is"
                 android:textSize="18sp" />
+            <LinearLayout
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/number_of_finish"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.5"
+                    android:gravity="left|center_vertical"
+                    android:text="here it is" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="#f2f2f2"
+                    android:layout_marginRight="5dp"/>
+
+                <TextView
+                    android:id="@+id/number_of_unfinish"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.5"
+                    android:gravity="left|center_vertical"
+                    android:text="here it is" />
+
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>

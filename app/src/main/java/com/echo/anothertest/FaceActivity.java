@@ -127,7 +127,12 @@ public class FaceActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         String[] someTestItem = new String[]{"跑步", "学钢琴", "看电视", "玩游戏", "学python", "练字", "上自习", "读英语", "练习街舞", "聊天"};
+        int[] someTestWorkTime = new int[]{1,2,3,4,5,6,7,8,9,10};
+        int[] someTestBreakTime = new int[]{1,2,3,4,1,2,3,4,1,2};
+        int[] sometotleTamato = new int[]{1,1,1,2,2,2,3,3,3,4};
+
         switch (item.getItemId()) {
             case R.id.action_settings:
                 if (myAdapter.getItemCount() != 0) {
@@ -140,7 +145,7 @@ public class FaceActivity extends AppCompatActivity
             case R.id.action_settings2:
                 Random random = new Random();
                 int a = random.nextInt(10);
-                Tomato currentTomato = new Tomato(25, 5, 4, someTestItem[a]);
+                Tomato currentTomato = new Tomato(someTestWorkTime[a], someTestBreakTime[a], sometotleTamato[a], someTestItem[a]);
                 tomatos.add(currentTomato);
                 saveTomatoList();
                 mRecyclerView.scrollToPosition(myAdapter.getItemCount() - 1);
@@ -177,14 +182,13 @@ public class FaceActivity extends AppCompatActivity
     }
 
     //存储数据
-
     private void saveTomatoList() {
         SharedPreferences.Editor editor = getSharedPreferences(FaceActivity.class.getName(), Context.MODE_PRIVATE).edit();
         if (myAdapter.getItemCount() != 0) {
             //使用类名来命名SharedPreferences
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i < myAdapter.getItemCount(); i++) {
-                sb.append(setTomatoToShare(tomatos.get(i))).append(",");
+                sb.append(SerializableHelper.setTomatoToShare(tomatos.get(i))).append(",");
             }
             String content = sb.toString().substring(0, sb.length() - 1);
             editor.putString(getString(R.string.alarm_list), content);
@@ -205,51 +209,8 @@ public class FaceActivity extends AppCompatActivity
             for (String string :
                     tomatoStrings) {
 
-                tomatos.add(getTomatoFromShare(string));
+                tomatos.add(SerializableHelper.getTomatoFromShare(string));
             }
         }
-    }
-
-    //序列化Tomato的方法
-    private String setTomatoToShare(Tomato tomato) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = null;
-        try {
-            oos = new ObjectOutputStream(baos);
-            oos.writeObject(tomato);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        String tomatoStr = new String(Base64.encode(baos.toByteArray(),
-                Base64.DEFAULT));
-        try {
-            baos.close();
-            oos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return tomatoStr;
-    }
-
-    //反序列化Tomato的方法
-    private Tomato getTomatoFromShare(String tomatoBase64){
-        try {
-            // 将base64格式字符串还原成byte数组
-            if (tomatoBase64 == null || tomatoBase64.equals("")) { // 不可少，否则在下面会报java.io.StreamCorruptedException
-                return null;
-            }
-            byte[] tomatoBytes = Base64.decode(tomatoBase64.getBytes(),
-                    Base64.DEFAULT);
-            ByteArrayInputStream bais = new ByteArrayInputStream(tomatoBytes);
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            // 将byte数组转换成Tomato对象
-            Object tomato = ois.readObject();
-            bais.close();
-            ois.close();
-            return (Tomato) tomato;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }

@@ -36,7 +36,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     public void onBindViewHolder(MyAdapter.ViewHolder viewHolder, int position) {
         // 给ViewHolder设置元素
         Tomato t = tomatos.get(position);
-        viewHolder.mTextView.setText(t.getJobDescription());
+        viewHolder.mTextWorkMinutes.setText("工作"+t.getWorkMinutes()+"分钟");
+        viewHolder.mTextBreakMinutes.setText("休息"+t.getBreakMinutes()+"分钟");
+        viewHolder.mTextJobDecription.setText(t.getJobDescription());
+        viewHolder.mTextTotleTamatoRepeat.setText(t.getTotleTamatoRepeat()+"个番茄");
+        viewHolder.mTextNumberOfFinish.setText("已完成"+t.getNumberOfFinish()+"次");
+        viewHolder.mTextNumberOfUnfinish.setText("未完成"+t.getNumberOfUnfinish()+"次");
     }
 
     @Override
@@ -48,10 +53,16 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
     // 重写的自定义ViewHolder
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView mTextView;
+        public TextView mTextWorkMinutes,mTextJobDecription,mTextBreakMinutes,mTextTotleTamatoRepeat,mTextNumberOfFinish,mTextNumberOfUnfinish;
         public ViewHolder(View v) {
             super(v);
-            mTextView = (TextView) v.findViewById(R.id.job_decription);
+            mTextWorkMinutes= (TextView) v.findViewById(R.id.card_work_minutes);
+            mTextJobDecription = (TextView) v.findViewById(R.id.job_decription);
+            mTextBreakMinutes = (TextView) v.findViewById(R.id.card_break_minutes);
+            mTextTotleTamatoRepeat = (TextView) v.findViewById(R.id.card_totle_tomato_repeat);
+            mTextNumberOfFinish = (TextView) v.findViewById(R.id.number_of_finish);
+            mTextNumberOfUnfinish = (TextView) v.findViewById(R.id.number_of_unfinish);
+
         }
     }
 }
