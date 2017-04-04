@@ -48,12 +48,23 @@ public class FaceActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        final String[] someTestItem = new String[]{"跑步", "学钢琴", "看电视", "玩游戏", "学python", "练字", "上自习", "读英语", "练习街舞", "聊天"};
+        final int[] someTestWorkTime = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        final int[] someTestBreakTime = new int[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2};
+        final int[] sometotleTamato = new int[]{1, 1, 1, 2, 2, 2, 3, 3, 3, 4};
+
         //设置右下角按钮功能
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO
+                Random random = new Random();
+                int a = random.nextInt(10);
+                Tomato currentTomato = new Tomato(someTestWorkTime[a], someTestBreakTime[a], sometotleTamato[a], someTestItem[a]);
+                tomatos.add(currentTomato);
+                saveTomatoList();
+                mRecyclerView.scrollToPosition(myAdapter.getItemCount() - 1);
+                myAdapter.notifyDataSetChanged();
             }
         });
 
@@ -152,28 +163,10 @@ public class FaceActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        String[] someTestItem = new String[]{"跑步", "学钢琴", "看电视", "玩游戏", "学python", "练字", "上自习", "读英语", "练习街舞", "聊天"};
-        int[] someTestWorkTime = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-        int[] someTestBreakTime = new int[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2};
-        int[] sometotleTamato = new int[]{1, 1, 1, 2, 2, 2, 3, 3, 3, 4};
-
         switch (item.getItemId()) {
             case R.id.action_settings:
-                if (myAdapter.getItemCount() != 0) {
-                    tomatos.remove(myAdapter.getItemCount() - 1);
-                    saveTomatoList();
-                    mRecyclerView.scrollToPosition(myAdapter.getItemCount() - 1);
-                    myAdapter.notifyDataSetChanged();
-                }
                 return true;
             case R.id.action_settings2:
-                Random random = new Random();
-                int a = random.nextInt(10);
-                Tomato currentTomato = new Tomato(someTestWorkTime[a], someTestBreakTime[a], sometotleTamato[a], someTestItem[a]);
-                tomatos.add(currentTomato);
-                saveTomatoList();
-                mRecyclerView.scrollToPosition(myAdapter.getItemCount() - 1);
-                myAdapter.notifyDataSetChanged();
                 return true;
 
         }
