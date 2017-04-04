@@ -86,4 +86,5 @@
     <string name="click_start">点击开始</string>
     <string name="start_tomato">开始番茄</string>
     <string name="alarm_list">alarmList</string>
+    <string name="input_hint">请输入八个字以内</string>
 </resources>
