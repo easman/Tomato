@@ -86,7 +86,7 @@
     <string name="click_start">点击开始</string>
     <string name="start_tomato">开始番茄</string>
     <string name="alarm_list">alarmList</string>
-    <string name="input_hint">请输入八个字以内</string>
+    <string name="input_hint">最多输入八个汉字</string>
     <string name="jopDescriptionCN">任务名称</string>
     <string name="useDefaultSettingCN">使用默认设置</string>
     <string name="creatCN">创建</string>

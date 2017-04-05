@@ -5,12 +5,20 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Base64;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,6 +28,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.SeekBar;
+import android.widget.Switch;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,6 +58,8 @@ public class FaceActivity extends AppCompatActivity
     private RecyclerView mRecyclerView;
     private MyAdapter myAdapter;
     private List<Tomato> tomatos = new ArrayList<Tomato>();
+    private PopupWindow creatTomatoWindow;
+    private View contentView1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,23 +68,19 @@ public class FaceActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final String[] someTestItem = new String[]{"跑步", "学钢琴", "看电视", "玩游戏", "学python", "练字", "上自习", "读英语", "练习街舞", "聊天"};
-        final int[] someTestWorkTime = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-        final int[] someTestBreakTime = new int[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2};
-        final int[] sometotleTamato = new int[]{1, 1, 1, 2, 2, 2, 3, 3, 3, 4};
-
-        //设置右下角按钮功能
+        //设置右下角新建按钮功能
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Random random = new Random();
-                int a = random.nextInt(10);
-                Tomato currentTomato = new Tomato(someTestWorkTime[a], someTestBreakTime[a], sometotleTamato[a], someTestItem[a]);
-                tomatos.add(currentTomato);
-                saveTomatoList();
-                mRecyclerView.scrollToPosition(myAdapter.getItemCount() - 1);
-                myAdapter.notifyDataSetChanged();
+                showCreatWindow(view);
+//                Random random = new Random();
+//                int a = random.nextInt(10);
+//                Tomato currentTomato = new Tomato(someTestWorkTime[a], someTestBreakTime[a], sometotleTamato[a], someTestItem[a]);
+//                tomatos.add(currentTomato);
+//                saveTomatoList();
+//                mRecyclerView.scrollToPosition(myAdapter.getItemCount() - 1);
+//                myAdapter.notifyDataSetChanged();
             }
         });
 
@@ -173,6 +189,7 @@ public class FaceActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -229,5 +246,178 @@ public class FaceActivity extends AppCompatActivity
                 tomatos.add(SerializableHelper.getTomatoFromShare(string));
             }
         }
+    }
+
+    //自定义新建设置界面
+    private void showCreatWindow(View parent) {
+        if (creatTomatoWindow == null) {
+            LayoutInflater mLayoutInflater = LayoutInflater.from(this);
+            contentView1 = mLayoutInflater.inflate(R.layout.popup_setting, null);
+            creatTomatoWindow = new PopupWindow(contentView1, ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+
+        //初始化item
+        final EditText inputJobDescription = (EditText) contentView1.findViewById(R.id.input_job_description);
+        final EditText inputWorkMinutes = (EditText) contentView1.findViewById(R.id.input_work_minutes);
+        final EditText inputBreakMinutes = (EditText) contentView1.findViewById(R.id.input_break_minutes);
+        final SeekBar seekTomatoRepeat = (SeekBar) contentView1.findViewById(R.id.seek_tomato_repeat);
+        final TextView showTomatoRepeat = (TextView) contentView1.findViewById(R.id.show_tomato_repeat);
+        TextView creatTomato = (TextView) contentView1.findViewById(R.id.click_to_creat_tomato);
+        Switch switchDefaultSetting = (Switch) contentView1.findViewById(R.id.switch_default_setting);
+
+        Switch switchSound = (Switch) contentView1.findViewById(R.id.switch_sound);
+        Switch switchWave = (Switch) contentView1.findViewById(R.id.switch_wave);
+
+
+        //“创建”按钮的监听事件
+        creatTomato.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //检查空值
+                StringBuffer sbf = new StringBuffer();
+                if (inputJobDescription.getText().toString().length() == 0) {
+                    sbf.append("任务名称，");
+                }
+                if (inputWorkMinutes.getText().toString().length() == 0) {
+                    sbf.append("番茄时长，");
+                }
+                if (inputBreakMinutes.getText().toString().length() == 0) {
+                    sbf.append("休息时长，");
+                }
+                if (sbf.length() > 0) {
+                    //显示toast信息
+                    String stShow = sbf.toString().substring(0, sbf.length() - 1)+" 不能空呦~";
+                    Toast toast = Toast.makeText(getApplicationContext(), stShow, Toast.LENGTH_SHORT);
+                    toast.show();
+                } else {
+                    Tomato currentTomato = new Tomato(Integer.parseInt(inputWorkMinutes.getText().toString()),
+                            Integer.parseInt(inputBreakMinutes.getText().toString()),
+                            seekTomatoRepeat.getProgress() + 1,
+                            inputJobDescription.getText().toString());
+                    tomatos.add(currentTomato);
+                    saveTomatoList();
+                    mRecyclerView.scrollToPosition(myAdapter.getItemCount() - 1);
+                    myAdapter.notifyDataSetChanged();
+                    creatTomatoWindow.dismiss();
+                    creatTomatoWindow = null;
+                }
+            }
+        });
+
+        //“启用默认设置”按钮监听器
+        switchDefaultSetting.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    inputWorkMinutes.setEnabled(false);
+                    inputBreakMinutes.setEnabled(false);
+                    seekTomatoRepeat.setEnabled(false);
+                } else {
+                    inputWorkMinutes.setEnabled(true);
+                    inputBreakMinutes.setEnabled(true);
+                    seekTomatoRepeat.setEnabled(true);
+                }
+            }
+        });
+
+        //显示当前选择的番茄个数
+        seekTomatoRepeat.setEnabled(false);
+        seekTomatoRepeat.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                String st = (progress + 1) + "个";
+                showTomatoRepeat.setText(st);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        //设置输入范围
+        inputWorkMinutes.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(!TextUtils.isEmpty(s)){
+                    if(Integer.parseInt(s.toString()) >120){
+                        inputWorkMinutes.setText("120");
+                    }
+                }
+            }
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        inputBreakMinutes.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(!TextUtils.isEmpty(s)){
+                    if(Integer.parseInt(s.toString()) >45){
+                        inputBreakMinutes.setText("45");
+                    }
+                }
+            }
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        //设置是否响铃
+        switchSound.setChecked(false);
+        switchSound.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+            }
+        });
+
+        //设置是否震动
+        switchWave.setChecked(false);
+        switchWave.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+            }
+        });
+
+
+        //产生背景变暗效果
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.alpha = 0.2f;
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        getWindow().setAttributes(lp);
+
+        //设置外部可点击dismiss
+        ColorDrawable cd = new ColorDrawable(0x000000);
+        creatTomatoWindow.setBackgroundDrawable(cd);
+        creatTomatoWindow.setOutsideTouchable(true);
+        creatTomatoWindow.setFocusable(true);
+
+        //设置动画
+        creatTomatoWindow.setAnimationStyle(R.style.popwin_anim_style);
+
+        //设置显示位置为屏幕中央
+        creatTomatoWindow.showAtLocation((View) parent.getParent(), Gravity.CENTER, 0, 0);
+
+        //设置dismiss时功能
+        creatTomatoWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+
+            //在dismiss中恢复透明度
+            public void onDismiss() {
+                WindowManager.LayoutParams lp = getWindow().getAttributes();
+                lp.alpha = 1f;
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                getWindow().setAttributes(lp);
+            }
+        });
+
     }
 }

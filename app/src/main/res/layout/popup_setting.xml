@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/setting_ori"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
     android:foreground="?android:attr/selectableItemBackground"
+    android:orientation="horizontal"
     card_view:cardBackgroundColor="@color/cardview_light_background"
     card_view:cardCornerRadius="5dp"
     card_view:cardElevation="7dp">
@@ -12,8 +13,8 @@
     <LinearLayout
         android:layout_width="280dp"
         android:layout_height="370dp"
-        android:orientation="vertical"
         android:background="#FFFFFF"
+        android:orientation="vertical"
         android:paddingLeft="10dp"
         android:paddingRight="10dp">
 
@@ -21,22 +22,24 @@
             android:id="@+id/click_to_creat_tomato"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:text="@string/creatCN"
-            android:textSize="18sp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
+            android:layout_gravity="end"
+            android:layout_marginBottom="7dp"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="7dp"/>
+            android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:paddingBottom="5dp"
+            android:paddingEnd="10dp"
+            android:paddingStart="10dp"
+            android:paddingTop="5dp"
+            android:text="@string/creatCN"
+            android:textSize="18sp" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="0.3dp"
-            android:background="@color/colorPrimaryLight"
             android:layout_marginBottom="2dp"
-            android:layout_marginTop="2dp"/>
+            android:layout_marginTop="2dp"
+            android:background="@color/colorPrimaryLight" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -52,17 +55,18 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:gravity="center_vertical||start"
+                    android:gravity="center_vertical|start"
                     android:text="@string/jopDescriptionCN" />
 
                 <EditText
                     android:id="@+id/input_job_description"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:hint="@string/input_hint"
-                    android:textSize="12sp"
                     android:gravity="center"
-                    />
+                    android:hint="@string/input_hint"
+                    android:maxLength="8"
+                    android:maxLines="1"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
@@ -75,18 +79,18 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:gravity="center_vertical||start"
+                    android:gravity="center_vertical|start"
                     android:text="@string/useDefaultSettingCN" />
 
                 <Switch
                     android:id="@+id/switch_default_setting"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:checked="true" />
 
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/setting1"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:orientation="horizontal">
@@ -95,34 +99,32 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:gravity="center_vertical||start"
+                    android:gravity="center_vertical|start"
                     android:text="@string/workMinutesCN" />
 
                 <EditText
                     android:id="@+id/input_work_minutes"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:enabled="false"
+                    android:gravity="center_vertical|end"
+                    android:inputType="number"
+                    android:maxLines="1"
                     android:text="@string/defaultWorkMinutesNumber"
-                    android:textSize="12sp"
-                    android:gravity="center_vertical||end"
-                    />
+                    android:textSize="12sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="@string/minutesCN"
-                    android:textSize="12sp"
                     android:layout_marginEnd="3dp"
                     android:gravity="center"
-                    />
-
-
+                    android:text="@string/minutesCN"
+                    android:textSize="12sp" />
 
 
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/setting2"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:orientation="horizontal">
@@ -131,69 +133,68 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:gravity="center_vertical||start"
+                    android:gravity="center_vertical|start"
                     android:text="@string/breakMinutesCN" />
 
                 <EditText
                     android:id="@+id/input_break_minutes"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:enabled="false"
+                    android:gravity="center_vertical|end"
+                    android:inputType="number"
+                    android:maxLines="1"
                     android:text="@string/defaultBreakMinutesNumber"
-                    android:textSize="12sp"
-                    android:gravity="center_vertical||end"
-                    />
+                    android:textSize="12sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="@string/minutesCN"
-                    android:textSize="12sp"
                     android:layout_marginEnd="3dp"
                     android:gravity="center"
-                    />
+                    android:text="@string/minutesCN"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/setting3"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/textView4"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="0.7"
-                    android:gravity="center_vertical||start"
+                    android:gravity="center_vertical|start"
                     android:text="@string/tomatoRepeatCN" />
 
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:layout_weight="0.3"
-                    android:orientation="vertical"
-                    android:layout_gravity="center">
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/show_tomato_repeat"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/defaultTomatoRepeatNumber"
-                        android:textSize="12sp"
                         android:layout_marginEnd="5dp"
-                        android:gravity="center_horizontal||end"
-                        />
+                        android:gravity="center_horizontal|end"
+                        android:text="@string/defaultTomatoRepeatNumber"
+                        android:textSize="12sp" />
 
                     <SeekBar
                         android:id="@+id/seek_tomato_repeat"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:max="3"/>
+                        android:enabled="false"
+                        android:max="3"
+                        android:progress="3" />
 
                 </LinearLayout>
-
 
 
             </LinearLayout>
@@ -204,9 +205,9 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="0.3dp"
-            android:background="@color/colorPrimaryLight"
             android:layout_marginBottom="2dp"
-            android:layout_marginTop="2dp"/>
+            android:layout_marginTop="2dp"
+            android:background="@color/colorPrimaryLight" />
 
 
         <LinearLayout
@@ -223,13 +224,13 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:gravity="center_vertical||start"
+                    android:gravity="center_vertical|start"
                     android:text="@string/soundCN" />
 
                 <Switch
                     android:id="@+id/switch_sound"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
 
             </LinearLayout>
 
@@ -242,13 +243,13 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:gravity="center_vertical||start"
+                    android:gravity="center_vertical|start"
                     android:text="@string/waveCN" />
 
                 <Switch
                     android:id="@+id/switch_wave"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
 
             </LinearLayout>
 
