@@ -19,6 +19,7 @@ import android.text.TextWatcher;
 import android.util.Base64;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -60,6 +61,7 @@ public class FaceActivity extends AppCompatActivity
     private List<Tomato> tomatos = new ArrayList<Tomato>();
     private PopupWindow creatTomatoWindow;
     private View contentView1;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,18 +71,11 @@ public class FaceActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         //设置右下角新建按钮功能
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showCreatWindow(view);
-//                Random random = new Random();
-//                int a = random.nextInt(10);
-//                Tomato currentTomato = new Tomato(someTestWorkTime[a], someTestBreakTime[a], sometotleTamato[a], someTestItem[a]);
-//                tomatos.add(currentTomato);
-//                saveTomatoList();
-//                mRecyclerView.scrollToPosition(myAdapter.getItemCount() - 1);
-//                myAdapter.notifyDataSetChanged();
             }
         });
 
@@ -102,6 +97,11 @@ public class FaceActivity extends AppCompatActivity
         myAdapter = new MyAdapter(this, tomatos);                            // 初始化自定义的适配器
         mRecyclerView.setAdapter(myAdapter);                                 // 为mRecyclerView设置适配器
         readSavedTomatoList();
+        if(tomatos.size()>=4){
+            fab.setAlpha(0.5f);
+        }else {
+            fab.setAlpha(1f);
+        }
 
         //设置点击番茄卡片事件
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
@@ -135,6 +135,11 @@ public class FaceActivity extends AppCompatActivity
                                 saveTomatoList();
                                 mRecyclerView.scrollToPosition(position);
                                 myAdapter.notifyDataSetChanged();
+                                if(tomatos.size()>=4){
+                                    fab.setAlpha(0.5f);
+                                }else {
+                                    fab.setAlpha(1f);
+                                }
                                 break;
                             default:
                                 break;
@@ -171,7 +176,6 @@ public class FaceActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.face, menu);
         return true;
     }
@@ -182,9 +186,6 @@ public class FaceActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.action_settings:
                 return true;
-            case R.id.action_settings2:
-                return true;
-
         }
         return super.onOptionsItemSelected(item);
     }
@@ -297,6 +298,11 @@ public class FaceActivity extends AppCompatActivity
                             inputJobDescription.getText().toString());
                     tomatos.add(currentTomato);
                     saveTomatoList();
+                    if(tomatos.size()>=4){
+                        fab.setAlpha(0.5f);
+                    }else {
+                        fab.setAlpha(1f);
+                    }
                     mRecyclerView.scrollToPosition(myAdapter.getItemCount() - 1);
                     myAdapter.notifyDataSetChanged();
                     creatTomatoWindow.dismiss();
