@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -36,6 +37,7 @@ public class MainActivity extends Activity {
     private int numberOfFinish;
     private int numberOfUnfinish;
     private String jobDescription;
+    private boolean isSound, isWave;
 
 
     //运行中调用参数
@@ -45,9 +47,11 @@ public class MainActivity extends Activity {
     private boolean currentSituation;
     private boolean isRunning;
     private boolean txStartHasNotClicked;
+    private boolean isTouchPause;
 
     private TasksCompletedView mTasksView;
     private TextView tx1, tx2, txStart, txNumber, txCounter;
+    private ImageView soundClicker, waveClicker;
     private Timer timer = new Timer();
     private TimerTask timerTask = null;
     private DecimalFormat df = new DecimalFormat();
@@ -114,16 +118,40 @@ public class MainActivity extends Activity {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        tx2.setText("啊啊啊啊，你真的不继续了吗");
-                        tx2.setTextColor(0xFF0000FF);
+                        isTouchPause = true;
                         break;
                     case MotionEvent.ACTION_UP:
-                        tx2.setText("长按暂停");
-                        tx2.setTextColor(0xFFFFFFFF);
+                        isTouchPause = false;
                         break;
 
                 }
                 return false;
+            }
+        });
+
+        soundClicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isSound) {
+                    soundClicker.setImageResource(R.drawable.ic_mute);
+                    isSound = false;
+                } else {
+                    soundClicker.setImageResource(R.drawable.ic_sound);
+                    isSound = true;
+                }
+            }
+        });
+
+        waveClicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isWave) {
+                    waveClicker.setImageResource(R.drawable.ic_unwave);
+                    isWave = false;
+                } else {
+                    waveClicker.setImageResource(R.drawable.ic_wave);
+                    isWave = true;
+                }
             }
         });
     }
@@ -140,14 +168,17 @@ public class MainActivity extends Activity {
     数据初始化方法
      */
     private void initVariable(Tomato tomato) {
-        workMinutes = tomato.getWorkMinutes()*1000*60;
-        breakMinutes = tomato.getBreakMinutes()*1000*60;
+        workMinutes = tomato.getWorkMinutes() * 1000 * 60;
+        breakMinutes = tomato.getBreakMinutes() * 1000 * 60;
         totleTomatoRepeat = tomato.getTotleTamatoRepeat();
         jobDescription = tomato.getJobDescription();
         numberOfFinish = tomato.getNumberOfFinish();
         numberOfUnfinish = tomato.getNumberOfUnfinish();
+        isSound = true;
+        isWave = true;
 
         isRunning = false;
+        isTouchPause = false;
         currentTomatoNumber = 0;
         currentSituation = WORK_TIME_SITUATION;
         mTotalProgress = workMinutes;
@@ -165,6 +196,8 @@ public class MainActivity extends Activity {
         txStart = (TextView) findViewById(R.id.txStart);
         txNumber = (TextView) findViewById(R.id.txNumber);
         txCounter = (TextView) findViewById(R.id.txCounter);
+        soundClicker = (ImageView) findViewById(R.id.soundClicker);
+        waveClicker = (ImageView) findViewById(R.id.waveClicker);
 
         tx1.setVisibility(View.INVISIBLE);
         tx2.setVisibility(View.INVISIBLE);
@@ -177,6 +210,7 @@ public class MainActivity extends Activity {
         txCounter.setText((mTotalProgress - mCurrentProgress) / 1000 / 60 + ":" + df.format((mTotalProgress - mCurrentProgress) / 1000 % 60));
         mTasksView.setmTotalProgress(mTotalProgress);
     }
+
 
     /*
     开启计时器方法
@@ -194,7 +228,6 @@ public class MainActivity extends Activity {
                     if (mCurrentProgress >= mTotalProgress) {
                         handler.sendEmptyMessage(MSG_TIME_IS_UP);
                         stopTimer();
-//                        endTomato();
                     }
 
                 }
@@ -283,12 +316,12 @@ public class MainActivity extends Activity {
     /*
     番茄终止时的处理方法
      */
-    private void endTomato(){
+    private void endTomato() {
         //对tomato对象标记完成状况
-        if (currentTomatoNumber==(double) totleTomatoRepeat-0.5){
+        if (currentTomatoNumber == (double) totleTomatoRepeat - 0.5) {
             numberOfFinish++;
             tomato.setNumberOfFinish(numberOfFinish);
-        }else {
+        } else {
             numberOfUnfinish++;
             tomato.setNumberOfUnfinish(numberOfUnfinish);
         }
@@ -297,7 +330,7 @@ public class MainActivity extends Activity {
         Intent intent = new Intent();
         intent.putExtra("tomato_back", tomatoString);
         //通过Intent对象返回结果，调用setResult方法
-        setResult(RESULT_OK,intent);
+        setResult(RESULT_OK, intent);
         finish();//结束当前的activity的生命周期
     }
 
