@@ -94,7 +94,7 @@ public class TasksCompletedView extends View {
     }
 
     public boolean justUsedStroke = true;
-    float val = 0.01f;
+    float val = 1f;
     public void setProgress(int progress) {
         if (justUsedStroke) {
             tempStrokeWidth = mStrokeWidth;
@@ -106,12 +106,12 @@ public class TasksCompletedView extends View {
     }
 
     public void setProgressWithStroke(int progress) {
-        if (justUsedStroke == false) {
+        if (!justUsedStroke) {
             justUsedStroke = true;
-            val = 0.001f;
+            val = 0.3f;
         }
-        tempStrokeWidth = tempStrokeWidth + val;
-        val = val+0.001f;
+        tempStrokeWidth += val;
+        val += 0.3f;
         mRingPaint.setStrokeWidth(tempStrokeWidth);
         mProgress = progress;
         postInvalidate();

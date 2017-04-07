@@ -122,9 +122,11 @@ public class MainActivity extends Activity {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         isTouchPause = true;
+                        tx2.setTextColor(0xFF84462C);
                         break;
                     case MotionEvent.ACTION_UP:
                         isTouchPause = false;
+                        tx2.setTextColor(0xFFFFFFFF);
                         break;
 
                 }
@@ -198,7 +200,7 @@ public class MainActivity extends Activity {
         txStart = (TextView) findViewById(R.id.txStart);
         txNumber = (TextView) findViewById(R.id.txNumber);
         txCounter = (TextView) findViewById(R.id.txCounter);
-        soundClicker  = (ImageView) findViewById(R.id.soundClicker);
+        soundClicker = (ImageView) findViewById(R.id.soundClicker);
         waveClicker = (ImageView) findViewById(R.id.waveClicker);
         if (isSound) {
             soundClicker.setImageResource(R.drawable.ic_sound);
@@ -224,7 +226,6 @@ public class MainActivity extends Activity {
         mTasksView.setmTotalProgress(mTotalProgress);
     }
 
-
     /*
     开启计时器方法
      */
@@ -233,25 +234,23 @@ public class MainActivity extends Activity {
             timerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    mCurrentProgress += 50;
+                    mCurrentProgress += 20;
                     watchHandler.sendEmptyMessage(MSG_TIME_TICK_UI);
                     if (mCurrentProgress % 1000 == 0) {
                         handler.sendEmptyMessage(MSG_TIME_TICK);
                     }
                     if (mCurrentProgress >= mTotalProgress) {
                         stopTimer();
+                        handler.sendEmptyMessage(MSG_TIME_IS_UP);
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        handler.sendEmptyMessage(MSG_TIME_IS_UP);
                     }
-
                 }
             };
-            timer.schedule(timerTask, 0, 50);//每隔10ms执行一次
-
+            timer.schedule(timerTask, 0, 20);//每隔10ms执行一次
         }
     }
 
@@ -332,7 +331,7 @@ public class MainActivity extends Activity {
                 case MSG_TIME_TICK_UI:
                     if (!isTouchPause) {
                         mTasksView.setProgress(mCurrentProgress);
-                    } else {
+                    } else if (isTouchPause) {
                         mTasksView.setProgressWithStroke(mCurrentProgress);
                     }
             }
