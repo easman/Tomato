@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -25,7 +26,8 @@ public class MainActivity extends Activity {
 
     private static final int MSG_TIME_IS_UP = 1;
     private static final int MSG_TIME_TICK = 2;
-    private static final int MST_PRESS_BACK_BUTTON = 3;
+    private static final int MSG_TIME_TICK_UI = 3;
+    private static final int MSG_PRESS_BACK_BUTTON = 4;
     private static final boolean WORK_TIME_SITUATION = true;
     private static final boolean BREAK_TIME_SITUATION = false;
 
@@ -46,7 +48,6 @@ public class MainActivity extends Activity {
     private double currentTomatoNumber;
     private boolean currentSituation;
     private boolean isRunning;
-    private boolean txStartHasNotClicked;
     private boolean isTouchPause;
 
     private TasksCompletedView mTasksView;
@@ -75,19 +76,21 @@ public class MainActivity extends Activity {
         DecimalFormat df = new DecimalFormat();
         df.applyPattern("00");
 
-        //设置txStart监听器
-        txStart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (txStartHasNotClicked) {
-                    tx2.setVisibility(View.VISIBLE);
-                    txStart.setText(jobDescription);
-                    txStartHasNotClicked = false;
-                    isRunning = true;
-                    startTimer();
-                }
-            }
-        });
+        //载入后直接开始计时初始化
+        tx2.setVisibility(View.VISIBLE);
+        txStart.setText(jobDescription);
+        isRunning = true;
+        startTimer();
+
+//        //设置txStart监听器
+//        txStart.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (txStartHasNotClicked) {
+//
+//                }
+//            }
+//        });
 
         //设置继续按钮监听器
         tx1.setOnClickListener(new View.OnClickListener() {
@@ -119,11 +122,9 @@ public class MainActivity extends Activity {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         isTouchPause = true;
-                        System.out.println(isTouchPause);
                         break;
                     case MotionEvent.ACTION_UP:
                         isTouchPause = false;
-                        System.out.println(isTouchPause);
                         break;
 
                 }
@@ -163,7 +164,7 @@ public class MainActivity extends Activity {
      */
     @Override
     public void onBackPressed() {
-        handler.sendEmptyMessage(MST_PRESS_BACK_BUTTON);
+        handler.sendEmptyMessage(MSG_PRESS_BACK_BUTTON);
     }
 
     /*
@@ -176,8 +177,8 @@ public class MainActivity extends Activity {
         jobDescription = tomato.getJobDescription();
         numberOfFinish = tomato.getNumberOfFinish();
         numberOfUnfinish = tomato.getNumberOfUnfinish();
-        isSound = true;
-        isWave = true;
+        isSound = tomato.isSound();
+        isWave = tomato.isWave();
 
         isRunning = false;
         isTouchPause = false;
@@ -185,7 +186,6 @@ public class MainActivity extends Activity {
         currentSituation = WORK_TIME_SITUATION;
         mTotalProgress = workMinutes;
         mCurrentProgress = 0;
-        txStartHasNotClicked = true;
     }
 
     /*
@@ -198,8 +198,19 @@ public class MainActivity extends Activity {
         txStart = (TextView) findViewById(R.id.txStart);
         txNumber = (TextView) findViewById(R.id.txNumber);
         txCounter = (TextView) findViewById(R.id.txCounter);
-        soundClicker = (ImageView) findViewById(R.id.soundClicker);
+        soundClicker  = (ImageView) findViewById(R.id.soundClicker);
         waveClicker = (ImageView) findViewById(R.id.waveClicker);
+        if (isSound) {
+            soundClicker.setImageResource(R.drawable.ic_sound);
+        } else {
+            soundClicker.setImageResource(R.drawable.ic_mute);
+        }
+        waveClicker = (ImageView) findViewById(R.id.waveClicker);
+        if (isWave) {
+            waveClicker.setImageResource(R.drawable.ic_wave);
+        } else {
+            waveClicker.setImageResource(R.drawable.ic_unwave);
+        }
 
         tx1.setVisibility(View.INVISIBLE);
         tx2.setVisibility(View.INVISIBLE);
@@ -222,23 +233,24 @@ public class MainActivity extends Activity {
             timerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    mCurrentProgress++;
-                    if (!isTouchPause) {
-                        mTasksView.setProgress(mCurrentProgress);
-                    } else {
-                        mTasksView.setProgressWithStroke(mCurrentProgress);
-                    }
+                    mCurrentProgress += 50;
+                    watchHandler.sendEmptyMessage(MSG_TIME_TICK_UI);
                     if (mCurrentProgress % 1000 == 0) {
                         handler.sendEmptyMessage(MSG_TIME_TICK);
                     }
                     if (mCurrentProgress >= mTotalProgress) {
-                        handler.sendEmptyMessage(MSG_TIME_IS_UP);
                         stopTimer();
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        handler.sendEmptyMessage(MSG_TIME_IS_UP);
                     }
 
                 }
             };
-            timer.schedule(timerTask, 0, 1);//延迟一秒执行，以后每隔1ms执行一次
+            timer.schedule(timerTask, 0, 50);//每隔10ms执行一次
 
         }
     }
@@ -261,7 +273,29 @@ public class MainActivity extends Activity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_TIME_IS_UP:
-//                    new AlertDialog.Builder(getContext()).setTitle("Time is up").setMessage("Time is up").setNegativeButton("Cancle", null).show();   //getContext????
+                    if (currentSituation == WORK_TIME_SITUATION) {
+                        if (isSound) {
+                            MediaPlayer mediaPlayer01;
+                            mediaPlayer01 = MediaPlayer.create(getBaseContext(), R.raw.break_sound);
+                            mediaPlayer01.start();
+                        }
+                        if (isWave) {
+                            long[] lg = new long[]{700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300};
+                            WaveUtil.wave(MainActivity.this, lg, false);
+                        }
+                        new AlertDialog.Builder(getContext()).setMessage("工作了那么久，该休息一下了！").setNegativeButton("OK", null).show();
+                    } else {
+                        if (isSound) {
+                            MediaPlayer mediaPlayer01;
+                            mediaPlayer01 = MediaPlayer.create(getBaseContext(), R.raw.work_sound);
+                            mediaPlayer01.start();
+                        }
+                        if (isWave) {
+                            long[] lg = new long[]{700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300};
+                            WaveUtil.wave(MainActivity.this, lg, false);
+                        }
+                        new AlertDialog.Builder(getContext()).setMessage("打起精神，现在是工作时间了！").setNegativeButton("OK", null).show();
+                    }
                     timeIsUpEvent();
                     break;
                 case MSG_TIME_TICK:
@@ -269,7 +303,7 @@ public class MainActivity extends Activity {
                     int second = (mTotalProgress - mCurrentProgress) / 1000 % 60;
                     txCounter.setText(minute + ":" + df.format(second));
                     break;
-                case MST_PRESS_BACK_BUTTON:
+                case MSG_PRESS_BACK_BUTTON:
                     stopTimer();
                     new AlertDialog.Builder(MainActivity.this).setCancelable(false).setMessage("你确定要结束这个番茄吗").setPositiveButton("结束番茄", new DialogInterface.OnClickListener() {
                         @Override
@@ -287,6 +321,20 @@ public class MainActivity extends Activity {
                         }
                     }).show();
                     break;
+            }
+        }
+    };
+
+    Handler watchHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_TIME_TICK_UI:
+                    if (!isTouchPause) {
+                        mTasksView.setProgress(mCurrentProgress);
+                    } else {
+                        mTasksView.setProgressWithStroke(mCurrentProgress);
+                    }
             }
         }
     };
@@ -314,7 +362,7 @@ public class MainActivity extends Activity {
             mTotalProgress = workMinutes;
             mTasksView.setmTotalProgress(mTotalProgress);
             mCurrentProgress = 0;
-            txStart.setText("Tic Tok =。=");
+            txStart.setText(jobDescription);
             startTimer();
         }
     }

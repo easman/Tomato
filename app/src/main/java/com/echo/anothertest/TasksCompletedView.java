@@ -16,11 +16,11 @@ import android.view.View;
 public class TasksCompletedView extends View {
 
     // 画实心圆的画笔
-    private Paint mCirclePaint;
+    //private Paint mCirclePaint;
     // 画圆环的画笔
     private Paint mRingPaint;
     // 圆形颜色
-    private int mCircleColor;
+    //private int mCircleColor;
     // 圆环颜色
     private int mRingColor;
     // 半径
@@ -52,17 +52,17 @@ public class TasksCompletedView extends View {
         mRadius = typeArray.getDimension(R.styleable.TasksCompletedView_radius, 80);
         mStrokeWidth = typeArray.getDimension(R.styleable.TasksCompletedView_strokeWidth, 10);
         tempStrokeWidth = mStrokeWidth;
-        mCircleColor = typeArray.getColor(R.styleable.TasksCompletedView_circleColor, 0xFFFFFFFF);
+        //mCircleColor = typeArray.getColor(R.styleable.TasksCompletedView_circleColor, 0xFFFFFFFF);
         mRingColor = typeArray.getColor(R.styleable.TasksCompletedView_ringColor, 0xFFFFFFFF);
 
         mRingRadius = mRadius + mStrokeWidth / 2;
     }
 
     private void initVariable() {
-        mCirclePaint = new Paint();
-        mCirclePaint.setAntiAlias(true);
-        mCirclePaint.setColor(mCircleColor);
-        mCirclePaint.setStyle(Paint.Style.FILL);
+//        mCirclePaint = new Paint();
+//        mCirclePaint.setAntiAlias(true);
+//        mCirclePaint.setColor(mCircleColor);
+//        mCirclePaint.setStyle(Paint.Style.FILL);
 
         mRingPaint = new Paint();
         mRingPaint.setAntiAlias(true);
@@ -77,7 +77,7 @@ public class TasksCompletedView extends View {
         mXCenter = getWidth() / 2;
         mYCenter = getHeight() / 2;
 
-        canvas.drawCircle(mXCenter, mYCenter, mRadius, mCirclePaint);
+//        canvas.drawCircle(mXCenter, mYCenter, mRadius, mCirclePaint);
 
         if (mProgress > 0) {
             RectF oval = new RectF();

@@ -264,12 +264,10 @@ public class FaceActivity extends AppCompatActivity
         final EditText inputBreakMinutes = (EditText) contentView1.findViewById(R.id.input_break_minutes);
         final SeekBar seekTomatoRepeat = (SeekBar) contentView1.findViewById(R.id.seek_tomato_repeat);
         final TextView showTomatoRepeat = (TextView) contentView1.findViewById(R.id.show_tomato_repeat);
+        final Switch switchSound = (Switch) contentView1.findViewById(R.id.switch_sound);
+        final Switch switchWave = (Switch) contentView1.findViewById(R.id.switch_wave);
         TextView creatTomato = (TextView) contentView1.findViewById(R.id.click_to_creat_tomato);
         Switch switchDefaultSetting = (Switch) contentView1.findViewById(R.id.switch_default_setting);
-
-        Switch switchSound = (Switch) contentView1.findViewById(R.id.switch_sound);
-        Switch switchWave = (Switch) contentView1.findViewById(R.id.switch_wave);
-
 
         //“创建”按钮的监听事件
         creatTomato.setOnClickListener(new View.OnClickListener() {
@@ -295,7 +293,9 @@ public class FaceActivity extends AppCompatActivity
                     Tomato currentTomato = new Tomato(Integer.parseInt(inputWorkMinutes.getText().toString()),
                             Integer.parseInt(inputBreakMinutes.getText().toString()),
                             seekTomatoRepeat.getProgress() + 1,
-                            inputJobDescription.getText().toString());
+                            inputJobDescription.getText().toString(),
+                            switchSound.isChecked(),
+                            switchWave.isChecked());
                     tomatos.add(currentTomato);
                     saveTomatoList();
                     if(tomatos.size()>=4){

@@ -15,15 +15,36 @@ public class Tomato implements Serializable {
     private int numberOfFinish;
     private int numberOfUnfinish;
     private boolean existSituation;
+    private boolean isSound = true;
+    private boolean isWave = true;
 
-    public Tomato(int workMinutes, int breakMinutes, int totleTamatoRepeat, String jobDescription) {
+    public Tomato(int workMinutes, int breakMinutes, int totleTamatoRepeat, String jobDescription,boolean isSound,boolean isWave) {
         this.breakMinutes = breakMinutes;
         this.workMinutes = workMinutes;
         this.totleTamatoRepeat = totleTamatoRepeat;
         this.jobDescription = jobDescription;
         this.numberOfFinish = 0;
         this.numberOfUnfinish = 0;
+        this.isSound = isSound;
+        this.isWave = isWave;
         this.existSituation = true;
+
+    }
+
+    public boolean isSound() {
+        return isSound;
+    }
+
+    public void setSound(boolean sound) {
+        isSound = sound;
+    }
+
+    public boolean isWave() {
+        return isWave;
+    }
+
+    public void setWave(boolean wave) {
+        isWave = wave;
     }
 
     public int getWorkMinutes() {
