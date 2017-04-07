@@ -22,7 +22,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.731"
         custom:circleColor="@color/colorPrimaryDark"
-        custom:radius="165dp"
+        custom:radius="140dp"
         custom:ringColor="@color/colorPrimaryLight"
         custom:strokeWidth="5dp" />
 

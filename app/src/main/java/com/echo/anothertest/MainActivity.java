@@ -119,9 +119,11 @@ public class MainActivity extends Activity {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         isTouchPause = true;
+                        System.out.println(isTouchPause);
                         break;
                     case MotionEvent.ACTION_UP:
                         isTouchPause = false;
+                        System.out.println(isTouchPause);
                         break;
 
                 }
@@ -221,7 +223,11 @@ public class MainActivity extends Activity {
                 @Override
                 public void run() {
                     mCurrentProgress++;
-                    mTasksView.setProgress(mCurrentProgress);
+                    if (!isTouchPause) {
+                        mTasksView.setProgress(mCurrentProgress);
+                    } else {
+                        mTasksView.setProgressWithStroke(mCurrentProgress);
+                    }
                     if (mCurrentProgress % 1000 == 0) {
                         handler.sendEmptyMessage(MSG_TIME_TICK);
                     }

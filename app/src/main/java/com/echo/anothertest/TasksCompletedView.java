@@ -29,6 +29,7 @@ public class TasksCompletedView extends View {
     private float mRingRadius;
     // 圆环宽度
     private float mStrokeWidth;
+    private float tempStrokeWidth;
     // 圆心x坐标
     private int mXCenter;
     // 圆心y坐标
@@ -50,6 +51,7 @@ public class TasksCompletedView extends View {
                 R.styleable.TasksCompletedView, 0, 0);
         mRadius = typeArray.getDimension(R.styleable.TasksCompletedView_radius, 80);
         mStrokeWidth = typeArray.getDimension(R.styleable.TasksCompletedView_strokeWidth, 10);
+        tempStrokeWidth = mStrokeWidth;
         mCircleColor = typeArray.getColor(R.styleable.TasksCompletedView_circleColor, 0xFFFFFFFF);
         mRingColor = typeArray.getColor(R.styleable.TasksCompletedView_ringColor, 0xFFFFFFFF);
 
@@ -66,7 +68,7 @@ public class TasksCompletedView extends View {
         mRingPaint.setAntiAlias(true);
         mRingPaint.setColor(mRingColor);
         mRingPaint.setStyle(Paint.Style.STROKE);
-        mRingPaint.setStrokeWidth(mStrokeWidth);
+        mRingPaint.setStrokeWidth(tempStrokeWidth);
     }
 
     @Override
@@ -77,20 +79,40 @@ public class TasksCompletedView extends View {
 
         canvas.drawCircle(mXCenter, mYCenter, mRadius, mCirclePaint);
 
-        if (mProgress > 0 ) {
+        if (mProgress > 0) {
             RectF oval = new RectF();
             oval.left = (mXCenter - mRingRadius);
             oval.top = (mYCenter - mRingRadius);
             oval.right = mRingRadius * 2 + (mXCenter - mRingRadius);
             oval.bottom = mRingRadius * 2 + (mYCenter - mRingRadius);
-            canvas.drawArc(oval, -90, ((float)mProgress / mTotalProgress) * 360, false, mRingPaint);
+            canvas.drawArc(oval, -90, ((float) mProgress / mTotalProgress) * 360, false, mRingPaint);
         }
     }
+
     public void setmTotalProgress(int mTotalProgress) {
         this.mTotalProgress = mTotalProgress;
     }
 
+    public boolean justUsedStroke = true;
+    float val = 0.01f;
     public void setProgress(int progress) {
+        if (justUsedStroke) {
+            tempStrokeWidth = mStrokeWidth;
+            justUsedStroke = false;
+        }
+        mRingPaint.setStrokeWidth(tempStrokeWidth);
+        mProgress = progress;
+        postInvalidate();
+    }
+
+    public void setProgressWithStroke(int progress) {
+        if (justUsedStroke == false) {
+            justUsedStroke = true;
+            val = 0.001f;
+        }
+        tempStrokeWidth = tempStrokeWidth + val;
+        val = val+0.001f;
+        mRingPaint.setStrokeWidth(tempStrokeWidth);
         mProgress = progress;
         postInvalidate();
     }

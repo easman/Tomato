@@ -7,4 +7,5 @@
     <color name="ring_color">#84462C</color>
     <color name="colorPrimaryLight">#FFCDD2</color>
     <color name="iconText">#FFFFFF</color>
+    <color name="textSecondary">#757575</color>
 </resources>
