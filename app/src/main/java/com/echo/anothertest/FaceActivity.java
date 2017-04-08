@@ -5,21 +5,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Base64;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -33,21 +29,15 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by Echo
@@ -60,15 +50,22 @@ public class FaceActivity extends AppCompatActivity
     private MyAdapter myAdapter;
     private List<Tomato> tomatos = new ArrayList<Tomato>();
     private PopupWindow creatTomatoWindow;
-    private View contentView1;
+    private View contentViewPop;
+    private View backgroundFace;
+    private Toolbar toolbar;
     private FloatingActionButton fab;
+    private boolean isEditMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_face);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        isEditMode = false;
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setTitle("番茄堆");
+        backgroundFace = findViewById(R.id.background_face_activity);
+
 
         //设置右下角新建按钮功能
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -92,63 +89,109 @@ public class FaceActivity extends AppCompatActivity
 
         mRecyclerView = (RecyclerView) findViewById(R.id.tomato_list);       // 拿到RecyclerView
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));       // 设置LinearLayoutManager
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());            // 设置ItemAnimator
-        mRecyclerView.setHasFixedSize(true);                                 // 设置固定大小
+//        mRecyclerView.setItemAnimator(new DefaultItemAnimator());            // 设置ItemAnimator
+//        mRecyclerView.setHasFixedSize(true);                                 // 设置固定大小
         myAdapter = new MyAdapter(this, tomatos);                            // 初始化自定义的适配器
         mRecyclerView.setAdapter(myAdapter);                                 // 为mRecyclerView设置适配器
         readSavedTomatoList();
-        if(tomatos.size()>=4){
+
+        //避免添加按钮遮挡卡片内容
+        if (tomatos.size() >= 4) {
             fab.setAlpha(0.5f);
-        }else {
+        } else {
             fab.setAlpha(1f);
         }
 
-        //设置点击番茄卡片事件
+        //设置编辑番茄卡片，为RecycleView绑定触摸事件
+        ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+            @Override
+            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                //首先回调的方法 返回int表示是否监听该方向
+                int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;//拖拽
+                int swipeFlags = ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;//侧滑删除
+                return makeMovementFlags(dragFlags, swipeFlags);
+            }
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                //滑动事件
+                Collections.swap(tomatos, viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                myAdapter.notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                saveTomatoList();
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                //侧滑事件
+                tomatos.remove(viewHolder.getAdapterPosition());
+                myAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+                saveTomatoList();
+            }
+
+            @Override
+            public boolean isLongPressDragEnabled() {
+                //是否可拖拽
+                if (isEditMode) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
+        helper.attachToRecyclerView(mRecyclerView);
+
+        // 设置点击番茄卡片事件
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, final int position) {
-                new AlertDialog.Builder(FaceActivity.this).setTitle("操作选项").setItems(new CharSequence[]{"开始番茄"}, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                String tomatoString = SerializableHelper.setTomatoToShare(tomatos.get(position));
-                                Intent intent = new Intent(FaceActivity.this, MainActivity.class);
-                                intent.putExtra("tomato", tomatoString);
-                                startActivityForResult(intent, position); //使用位置作为结果码，便于结束后更新数据
-                                break;
-                            default:
-                                break;
+                if (!isEditMode) {
+                    new AlertDialog.Builder(FaceActivity.this).setTitle("操作选项").setItems(new CharSequence[]{"开始番茄"}, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case 0:
+                                    String tomatoString = SerializableHelper.setTomatoToShare(tomatos.get(position));
+                                    Intent intent = new Intent(FaceActivity.this, MainActivity.class);
+                                    intent.putExtra("tomato", tomatoString);
+                                    startActivityForResult(intent, position); //使用位置作为结果码，便于结束后更新数据
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
-                    }
-                }).setNegativeButton("取消", null).show();
+                    }).setNegativeButton("取消", null).show();
+                }
             }
 
             @Override
             public void onItemLongClick(View view, final int position) {
-                new AlertDialog.Builder(FaceActivity.this).setTitle("操作选项").setItems(new CharSequence[]{"删除"}, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                tomatos.remove(position);
-                                saveTomatoList();
-                                mRecyclerView.scrollToPosition(position);
-                                myAdapter.notifyDataSetChanged();
-                                if(tomatos.size()>=4){
-                                    fab.setAlpha(0.5f);
-                                }else {
-                                    fab.setAlpha(1f);
-                                }
-                                break;
-                            default:
-                                break;
-                        }
+                if (!isEditMode) {
+                    new AlertDialog.Builder(FaceActivity.this).setTitle("操作选项").setItems(new CharSequence[]{"删除"}, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case 0:
+                                    tomatos.remove(position);
+                                    saveTomatoList();
+                                    mRecyclerView.scrollToPosition(position);
+                                    myAdapter.notifyDataSetChanged();
+                                    if (tomatos.size() >= 4) {
+                                        fab.setAlpha(0.5f);
+                                    } else {
+                                        fab.setAlpha(1f);
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
 
-                    }
-                }).setNegativeButton("取消", null).show();
+                        }
+                    }).setNegativeButton("取消", null).show();
+                }
             }
         }));
+
 
     }
 
@@ -185,6 +228,19 @@ public class FaceActivity extends AppCompatActivity
 
         switch (item.getItemId()) {
             case R.id.action_settings:
+                if (isEditMode) {
+                    isEditMode = false;
+                    item.setIcon(R.drawable.ic_menu_manage);
+                    toolbar.setTitle("番茄堆");
+                    toolbar.setAlpha(1f);
+                    backgroundFace.setVisibility(View.GONE);
+                } else {
+                    isEditMode = true;
+                    item.setIcon(R.drawable.ic_menu_gallery);
+                    toolbar.setTitle("编辑模式");
+                    toolbar.setAlpha(0.5f);
+                    backgroundFace.setVisibility(View.VISIBLE);
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -226,18 +282,23 @@ public class FaceActivity extends AppCompatActivity
                 sb.append(SerializableHelper.setTomatoToShare(tomatos.get(i))).append(",");
             }
             String content = sb.toString().substring(0, sb.length() - 1);
-            editor.putString(getString(R.string.alarm_list), content);
+            editor.putString(getString(R.string.card_list), content);
             editor.commit();
         } else {
             editor.clear();
             editor.commit();
+        }
+        if (tomatos.size() >= 4) {
+            fab.setAlpha(0.5f);
+        } else {
+            fab.setAlpha(1f);
         }
     }
 
     //读取数据
     private void readSavedTomatoList() {
         SharedPreferences sp = getSharedPreferences(FaceActivity.class.getName(), Context.MODE_PRIVATE);
-        String content = sp.getString(getString(R.string.alarm_list), null);
+        String content = sp.getString(getString(R.string.card_list), null);
 
         if (content != null) {
             String[] tomatoStrings = content.split(",");
@@ -253,21 +314,21 @@ public class FaceActivity extends AppCompatActivity
     private void showCreatWindow(View parent) {
         if (creatTomatoWindow == null) {
             LayoutInflater mLayoutInflater = LayoutInflater.from(this);
-            contentView1 = mLayoutInflater.inflate(R.layout.popup_setting, null);
-            creatTomatoWindow = new PopupWindow(contentView1, ViewGroup.LayoutParams.WRAP_CONTENT,
+            contentViewPop = mLayoutInflater.inflate(R.layout.popup_setting, null);
+            creatTomatoWindow = new PopupWindow(contentViewPop, ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
         }
 
         //初始化item
-        final EditText inputJobDescription = (EditText) contentView1.findViewById(R.id.input_job_description);
-        final EditText inputWorkMinutes = (EditText) contentView1.findViewById(R.id.input_work_minutes);
-        final EditText inputBreakMinutes = (EditText) contentView1.findViewById(R.id.input_break_minutes);
-        final SeekBar seekTomatoRepeat = (SeekBar) contentView1.findViewById(R.id.seek_tomato_repeat);
-        final TextView showTomatoRepeat = (TextView) contentView1.findViewById(R.id.show_tomato_repeat);
-        final Switch switchSound = (Switch) contentView1.findViewById(R.id.switch_sound);
-        final Switch switchWave = (Switch) contentView1.findViewById(R.id.switch_wave);
-        TextView creatTomato = (TextView) contentView1.findViewById(R.id.click_to_creat_tomato);
-        Switch switchDefaultSetting = (Switch) contentView1.findViewById(R.id.switch_default_setting);
+        final EditText inputJobDescription = (EditText) contentViewPop.findViewById(R.id.input_job_description);
+        final EditText inputWorkMinutes = (EditText) contentViewPop.findViewById(R.id.input_work_minutes);
+        final EditText inputBreakMinutes = (EditText) contentViewPop.findViewById(R.id.input_break_minutes);
+        final SeekBar seekTomatoRepeat = (SeekBar) contentViewPop.findViewById(R.id.seek_tomato_repeat);
+        final TextView showTomatoRepeat = (TextView) contentViewPop.findViewById(R.id.show_tomato_repeat);
+        final Switch switchSound = (Switch) contentViewPop.findViewById(R.id.switch_sound);
+        final Switch switchWave = (Switch) contentViewPop.findViewById(R.id.switch_wave);
+        TextView creatTomato = (TextView) contentViewPop.findViewById(R.id.click_to_creat_tomato);
+        Switch switchDefaultSetting = (Switch) contentViewPop.findViewById(R.id.switch_default_setting);
 
         //“创建”按钮的监听事件
         creatTomato.setOnClickListener(new View.OnClickListener() {
@@ -286,7 +347,7 @@ public class FaceActivity extends AppCompatActivity
                 }
                 if (sbf.length() > 0) {
                     //显示toast信息
-                    String stShow = sbf.toString().substring(0, sbf.length() - 1)+" 不能空呦~";
+                    String stShow = sbf.toString().substring(0, sbf.length() - 1) + " 不能空呦~";
                     Toast toast = Toast.makeText(getApplicationContext(), stShow, Toast.LENGTH_SHORT);
                     toast.show();
                 } else {
@@ -298,11 +359,6 @@ public class FaceActivity extends AppCompatActivity
                             switchWave.isChecked());
                     tomatos.add(currentTomato);
                     saveTomatoList();
-                    if(tomatos.size()>=4){
-                        fab.setAlpha(0.5f);
-                    }else {
-                        fab.setAlpha(1f);
-                    }
                     mRecyclerView.scrollToPosition(myAdapter.getItemCount() - 1);
                     myAdapter.notifyDataSetChanged();
                     creatTomatoWindow.dismiss();
@@ -349,31 +405,39 @@ public class FaceActivity extends AppCompatActivity
         inputWorkMinutes.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(!TextUtils.isEmpty(s)){
-                    if(Integer.parseInt(s.toString()) >120){
+                if (!TextUtils.isEmpty(s)) {
+                    if (Integer.parseInt(s.toString()) > 120) {
                         inputWorkMinutes.setText("120");
                     }
                 }
             }
+
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         inputBreakMinutes.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(!TextUtils.isEmpty(s)){
-                    if(Integer.parseInt(s.toString()) >45){
+                if (!TextUtils.isEmpty(s)) {
+                    if (Integer.parseInt(s.toString()) > 45) {
                         inputBreakMinutes.setText("45");
                     }
                 }
             }
+
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         //设置是否响铃
