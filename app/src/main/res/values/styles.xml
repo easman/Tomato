@@ -14,8 +14,8 @@
     </style>
 
     <style name="popwin_anim_style">
-        <item name="android:windowEnterAnimation">@animator/popupwindowshow</item>
-        <item name="android:windowExitAnimation">@animator/popupwindowhide</item>
+        <item name="android:windowEnterAnimation">@animator/show</item>
+        <item name="android:windowExitAnimation">@animator/hide</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

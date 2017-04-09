@@ -27,6 +27,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.PopupWindow;
@@ -220,12 +222,18 @@ public class FaceActivity extends AppCompatActivity
                     toolbar.setTitle("番茄堆");
                     toolbar.setAlpha(1f);
                     backgroundFace.setVisibility(View.GONE);
+                    AnimationSet animationSet = (AnimationSet) AnimationUtils.loadAnimation(FaceActivity.this, R.anim.show);
+                    fab.startAnimation(animationSet);
+                    fab.setVisibility(View.VISIBLE);
                 } else {
                     isEditMode = true;
                     item.setIcon(R.drawable.ic_menu_gallery);
                     toolbar.setTitle("编辑模式");
                     toolbar.setAlpha(0.5f);
                     backgroundFace.setVisibility(View.VISIBLE);
+                    AnimationSet animationSet = (AnimationSet) AnimationUtils.loadAnimation(FaceActivity.this, R.anim.hide);
+                    fab.startAnimation(animationSet);
+                    fab.setVisibility(View.GONE);
                 }
                 return true;
         }
