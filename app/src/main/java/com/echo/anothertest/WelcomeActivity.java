@@ -22,20 +22,24 @@ public class WelcomeActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        View decorView = getWindow().getDecorView();
+
         // 隐藏导航栏，全屏化
+        View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN;
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
+
         setContentView(R.layout.activity_welcome);
 
         //获取屏幕尺寸，加载位图
         welcome = (ImageView) findViewById(R.id.welcome);
         welcome.setImageBitmap(DecodeBitmapHelper.decodeSampledBitmapFromResource(getResources(), R.drawable.fu,400,400));
+        welcome.setClickable(false);
 
         //确定是否为第一次启动
         SharedPreferences sp = getSharedPreferences("First_Run", Context.MODE_PRIVATE);
