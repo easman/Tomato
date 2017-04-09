@@ -206,31 +206,25 @@ public class FaceActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_settings:
                 if (isEditMode) {
-                    isEditMode = false;
                     item.setIcon(R.drawable.ic_edit);
-                    toolbar.setTitle("番茄堆");
-                    toolbar.setAlpha(1f);
-                    backgroundFace.setBackgroundColor(Color.parseColor("#FFFFFF"));
-                    if (tomatos.size() == 0) {
-                        backgroundFace.setText("点击右下角按钮添加番茄");
-                    }
-                    AnimationSet animationSet = (AnimationSet) AnimationUtils.loadAnimation(FaceActivity.this, R.anim.show);
-                    fab.startAnimation(animationSet);
-                    fab.setVisibility(View.VISIBLE);
+                    exitEditMode();
                 } else {
-                    isEditMode = true;
                     item.setIcon(R.drawable.ic_back);
-                    toolbar.setTitle("编辑模式");
-                    toolbar.setAlpha(0.5f);
-                    backgroundFace.setBackgroundColor(Color.parseColor("#E1E1E1"));
-                    backgroundFace.setText("");
-                    AnimationSet animationSet = (AnimationSet) AnimationUtils.loadAnimation(FaceActivity.this, R.anim.hide);
-                    fab.startAnimation(animationSet);
-                    fab.setVisibility(View.GONE);
+                    toEditMode();
                 }
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this).setMessage("你确定要退出吗？").setNegativeButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        }).setPositiveButton("取消", null).show();
     }
 
     //存储数据
@@ -458,5 +452,31 @@ public class FaceActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    //打开编辑模式
+    private void toEditMode() {
+        isEditMode = true;
+        toolbar.setTitle("编辑模式");
+        toolbar.setAlpha(0.5f);
+        backgroundFace.setBackgroundColor(Color.parseColor("#E1E1E1"));
+        backgroundFace.setText("");
+        AnimationSet animationSet = (AnimationSet) AnimationUtils.loadAnimation(FaceActivity.this, R.anim.hide);
+        fab.startAnimation(animationSet);
+        fab.setVisibility(View.GONE);
+    }
+
+    //关闭编辑模式
+    private void exitEditMode() {
+        isEditMode = false;
+        toolbar.setTitle("番茄堆");
+        toolbar.setAlpha(1f);
+        backgroundFace.setBackgroundColor(Color.parseColor("#FFFFFF"));
+        if (tomatos.size() == 0) {
+            backgroundFace.setText("点击右下角按钮添加番茄");
+        }
+        AnimationSet animationSet = (AnimationSet) AnimationUtils.loadAnimation(FaceActivity.this, R.anim.show);
+        fab.startAnimation(animationSet);
+        fab.setVisibility(View.VISIBLE);
     }
 }
