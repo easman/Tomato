@@ -62,10 +62,9 @@ public class FaceActivity extends AppCompatActivity
         setContentView(R.layout.activity_face);
         isEditMode = false;
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         toolbar.setTitle("番茄堆");
+        setSupportActionBar(toolbar);
         backgroundFace = findViewById(R.id.background_face_activity);
-
 
         //设置右下角新建按钮功能
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -146,48 +145,35 @@ public class FaceActivity extends AppCompatActivity
             @Override
             public void onItemClick(View view, final int position) {
                 if (!isEditMode) {
-                    new AlertDialog.Builder(FaceActivity.this).setTitle("操作选项").setItems(new CharSequence[]{"开始番茄"}, new DialogInterface.OnClickListener() {
+                    new AlertDialog.Builder(FaceActivity.this).setMessage("你要开始这堆番茄吗？").setNegativeButton("是的，我要开始", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case 0:
-                                    String tomatoString = SerializableHelper.setTomatoToShare(tomatos.get(position));
-                                    Intent intent = new Intent(FaceActivity.this, MainActivity.class);
-                                    intent.putExtra("tomato", tomatoString);
-                                    startActivityForResult(intent, position); //使用位置作为结果码，便于结束后更新数据
-                                    break;
-                                default:
-                                    break;
-                            }
+                            String tomatoString = SerializableHelper.setTomatoToShare(tomatos.get(position));
+                            Intent intent = new Intent(FaceActivity.this, MainActivity.class);
+                            intent.putExtra("tomato", tomatoString);
+                            startActivityForResult(intent, position); //使用位置作为结果码，便于结束后更新数据
                         }
-                    }).setNegativeButton("取消", null).show();
+                    }).setPositiveButton("不，我要再想想", null).show();
                 }
             }
 
             @Override
             public void onItemLongClick(View view, final int position) {
                 if (!isEditMode) {
-                    new AlertDialog.Builder(FaceActivity.this).setTitle("操作选项").setItems(new CharSequence[]{"删除"}, new DialogInterface.OnClickListener() {
+                    new AlertDialog.Builder(FaceActivity.this).setMessage("你想要删除这堆番茄吗").setNegativeButton("是的，我要删除", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case 0:
-                                    tomatos.remove(position);
-                                    saveTomatoList();
-                                    mRecyclerView.scrollToPosition(position);
-                                    myAdapter.notifyDataSetChanged();
-                                    if (tomatos.size() >= 4) {
-                                        fab.setAlpha(0.5f);
-                                    } else {
-                                        fab.setAlpha(1f);
-                                    }
-                                    break;
-                                default:
-                                    break;
+                            tomatos.remove(position);
+                            saveTomatoList();
+                            mRecyclerView.scrollToPosition(position);
+                            myAdapter.notifyDataSetChanged();
+                            if (tomatos.size() >= 4) {
+                                fab.setAlpha(0.5f);
+                            } else {
+                                fab.setAlpha(1f);
                             }
-
                         }
-                    }).setNegativeButton("取消", null).show();
+                    }).setPositiveButton("不，我要再想想", null).show();
                 }
             }
         }));
@@ -408,6 +394,8 @@ public class FaceActivity extends AppCompatActivity
                 if (!TextUtils.isEmpty(s)) {
                     if (Integer.parseInt(s.toString()) > 120) {
                         inputWorkMinutes.setText("120");
+                    } else if (Integer.parseInt(s.toString()) < 120) {
+                        inputWorkMinutes.setText("1");
                     }
                 }
             }
@@ -427,6 +415,8 @@ public class FaceActivity extends AppCompatActivity
                 if (!TextUtils.isEmpty(s)) {
                     if (Integer.parseInt(s.toString()) > 45) {
                         inputBreakMinutes.setText("45");
+                    } else if (Integer.parseInt(s.toString()) < 1) {
+                        inputBreakMinutes.setText("1");
                     }
                 }
             }

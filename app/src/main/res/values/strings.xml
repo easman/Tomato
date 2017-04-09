@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">anotherTest</string>
+    <string name="app_name">番茄堆</string>
     <string name="press_to_start">Press to START</string>
     <string name="go_on">Go_On</string>
     <string name="pause">Pause</string>
@@ -99,4 +99,7 @@
     <string name="defaultTomatoRepeatNumber">4个</string>
     <string name="soundCN">声音</string>
     <string name="waveCN">震动</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+
 </resources>
