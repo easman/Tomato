@@ -2,6 +2,7 @@ package com.echo.anothertest;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Vibrator;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -28,8 +30,8 @@ public class MainActivity extends Activity {
     private static final int MSG_TIME_TICK = 2;
     private static final int MSG_TIME_TICK_UI = 3;
     private static final int MSG_PRESS_BACK_BUTTON = 4;
-    private static final boolean WORK_TIME_SITUATION = true;
-    private static final boolean BREAK_TIME_SITUATION = false;
+    private static final int WORK_TIME_SITUATION = 10;
+    private static final int BREAK_TIME_SITUATION = 11;
 
     //载入数据参数
     private Tomato tomato;
@@ -46,7 +48,7 @@ public class MainActivity extends Activity {
     private int mTotalProgress;
     private int mCurrentProgress;
     private double currentTomatoNumber;
-    private boolean currentSituation;
+    private int currentSituation;
     private boolean isRunning;
     private boolean isTouchPause;
 
@@ -57,7 +59,9 @@ public class MainActivity extends Activity {
     private TimerTask timerTask = null;
     private DecimalFormat df = new DecimalFormat();
 
-
+    /*
+    创建Activity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -265,36 +269,147 @@ public class MainActivity extends Activity {
     }
 
     /*
-    使用Handler进行UI更新
+    工作完成或休息完成时的处理方法
      */
+    private void timeIsUpEvent() {
+        final MediaPlayer mediaPlayer;
+        final Vibrator vib = (Vibrator) getSystemService(Service.VIBRATOR_SERVICE);
+
+        currentTomatoNumber += 0.5;
+
+        //判断当前执行的是工作还是休息状态
+        if (currentSituation == WORK_TIME_SITUATION) {
+
+            //更新番茄个数
+            txNumber.setText((int) (currentTomatoNumber + 1) + "个番茄/" + totleTomatoRepeat + "个番茄");
+
+            //判断是否已经完成番茄
+            if (totleTomatoRepeat - 1 == (int) currentTomatoNumber) {
+
+                //震动和铃音
+                mediaPlayer = MediaPlayer.create(getBaseContext(), R.raw.break_sound);
+                if (isSound) {
+                    mediaPlayer.start();
+                }
+                if (isWave) {
+                    long[] lg = new long[]{700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300};
+                    vib.vibrate(lg, -1);
+                }
+                new AlertDialog.Builder(getContext()).setTitle("恭喜你又完成了一个任务").setMessage("点击OK或空白离开").setNegativeButton("OK", null).setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        if (mediaPlayer.isPlaying()) {
+                            mediaPlayer.stop();
+                            mediaPlayer.release();
+                        }
+                        vib.cancel();
+                        endTomato();
+                    }
+                }).show();
+            } else {
+
+                //震动和铃音
+                mediaPlayer = MediaPlayer.create(getBaseContext(), R.raw.break_sound);
+                if (isSound) {
+                    mediaPlayer.start();
+                }
+                if (isWave) {
+                    long[] lg = new long[]{700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300};
+                    vib.vibrate(lg, -1);
+                }
+                new AlertDialog.Builder(getContext()).setMessage("工作了那么久，该休息一下了！").setNegativeButton("OK", null).setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        if (mediaPlayer.isPlaying()) {
+                            mediaPlayer.stop();
+                            mediaPlayer.release();
+                        }
+                        vib.cancel();
+                    }
+                }).show();
+
+                //更新数据
+                currentSituation = BREAK_TIME_SITUATION;
+                mTotalProgress = breakMinutes;
+                mTasksView.setmTotalProgress(mTotalProgress);
+                mCurrentProgress = 0;
+                txStart.setText("休息一下");
+                startTimer();
+            }
+        } else if (currentSituation == BREAK_TIME_SITUATION) {
+
+            //震动和铃音
+            mediaPlayer = MediaPlayer.create(getBaseContext(), R.raw.work_sound);
+            if (isSound) {
+                mediaPlayer.start();
+            }
+            if (isWave) {
+                long[] lg = new long[]{700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300};
+                vib.vibrate(lg, -1);
+            }
+            new AlertDialog.Builder(getContext()).setMessage("打起精神，现在是工作时间了！").setNegativeButton("OK", null).setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    if (mediaPlayer.isPlaying()) {
+                        mediaPlayer.stop();
+                        mediaPlayer.release();
+                    }
+                    vib.cancel();
+                }
+            }).show();
+
+            // 更新数据
+            txNumber.setText((int) (currentTomatoNumber + 1) + "个番茄/" + totleTomatoRepeat + "个番茄");
+            currentSituation = WORK_TIME_SITUATION;
+            mTotalProgress = workMinutes;
+            mTasksView.setmTotalProgress(mTotalProgress);
+            mCurrentProgress = 0;
+            txStart.setText(jobDescription);
+            startTimer();
+        }
+    }
+
+    /*
+    番茄终止时的处理方法
+     */
+    private void endTomato() {
+        //对tomato对象标记完成状况
+        if (currentTomatoNumber == (double) totleTomatoRepeat - 0.5) {
+            numberOfFinish++;
+            tomato.setNumberOfFinish(numberOfFinish);
+        } else {
+            numberOfUnfinish++;
+            tomato.setNumberOfUnfinish(numberOfUnfinish);
+        }
+
+        //记录响铃和震动设置
+        tomato.setSound(isSound);
+        tomato.setWave(isWave);
+
+        //序列化tomato对象
+        String tomatoString = SerializableHelper.setTomatoToShare(tomato);
+        Intent intent = new Intent();
+        intent.putExtra("tomato_back", tomatoString);
+        //通过Intent对象返回结果，调用setResult方法
+        setResult(RESULT_OK, intent);
+        finish();//结束当前的activity的生命周期
+    }
+
+    /*
+    返回context
+     */
+    private Context getContext() {
+        return this;
+    }
+
+    /*
+   使用Handler进行UI更新
+    */
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_TIME_IS_UP:
-                    if (currentSituation == WORK_TIME_SITUATION) {
-                        if (isSound) {
-                            MediaPlayer mediaPlayer01;
-                            mediaPlayer01 = MediaPlayer.create(getBaseContext(), R.raw.break_sound);
-                            mediaPlayer01.start();
-                        }
-                        if (isWave) {
-                            long[] lg = new long[]{700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300};
-                            WaveUtil.wave(MainActivity.this, lg, false);
-                        }
-                        new AlertDialog.Builder(getContext()).setMessage("工作了那么久，该休息一下了！").setNegativeButton("OK", null).show();
-                    } else {
-                        if (isSound) {
-                            MediaPlayer mediaPlayer01;
-                            mediaPlayer01 = MediaPlayer.create(getBaseContext(), R.raw.work_sound);
-                            mediaPlayer01.start();
-                        }
-                        if (isWave) {
-                            long[] lg = new long[]{700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300};
-                            WaveUtil.wave(MainActivity.this, lg, false);
-                        }
-                        new AlertDialog.Builder(getContext()).setMessage("打起精神，现在是工作时间了！").setNegativeButton("OK", null).show();
-                    }
                     timeIsUpEvent();
                     break;
                 case MSG_TIME_TICK:
@@ -324,70 +439,18 @@ public class MainActivity extends Activity {
         }
     };
 
+    //设置更新表盘的Handler
     Handler watchHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_TIME_TICK_UI:
-                    if (!isTouchPause) {
-                        mTasksView.setProgress(mCurrentProgress);
-                    } else if (isTouchPause) {
-                        mTasksView.setProgressWithStroke(mCurrentProgress);
+                    if (isTouchPause) {
+                        mTasksView.setProgressWithStroke(mTotalProgress - mCurrentProgress);
+                    } else {
+                        mTasksView.setProgress(mTotalProgress - mCurrentProgress);
                     }
             }
         }
     };
-
-    /*
-    工作完成或休息完成时的处理方法
-     */
-    private void timeIsUpEvent() {
-        currentTomatoNumber += 0.5;
-        if (currentSituation == WORK_TIME_SITUATION) {   //判断当前执行的是工作还是休息状态
-            txNumber.setText((int) (currentTomatoNumber + 1) + "个番茄/" + totleTomatoRepeat + "个番茄");
-            if (totleTomatoRepeat - 1 == (int) currentTomatoNumber) {       //判断是否已经完成番茄
-                endTomato();
-            } else {
-                currentSituation = BREAK_TIME_SITUATION;
-                mTotalProgress = breakMinutes;
-                mTasksView.setmTotalProgress(mTotalProgress);
-                mCurrentProgress = 0;
-                txStart.setText("休息一下");
-                startTimer();
-            }
-        } else if (currentSituation == BREAK_TIME_SITUATION) {
-            txNumber.setText((int) (currentTomatoNumber + 1) + "个番茄/" + totleTomatoRepeat + "个番茄");
-            currentSituation = WORK_TIME_SITUATION;
-            mTotalProgress = workMinutes;
-            mTasksView.setmTotalProgress(mTotalProgress);
-            mCurrentProgress = 0;
-            txStart.setText(jobDescription);
-            startTimer();
-        }
-    }
-
-    /*
-    番茄终止时的处理方法
-     */
-    private void endTomato() {
-        //对tomato对象标记完成状况
-        if (currentTomatoNumber == (double) totleTomatoRepeat - 0.5) {
-            numberOfFinish++;
-            tomato.setNumberOfFinish(numberOfFinish);
-        } else {
-            numberOfUnfinish++;
-            tomato.setNumberOfUnfinish(numberOfUnfinish);
-        }
-        //序列化tomato对象
-        String tomatoString = SerializableHelper.setTomatoToShare(tomato);
-        Intent intent = new Intent();
-        intent.putExtra("tomato_back", tomatoString);
-        //通过Intent对象返回结果，调用setResult方法
-        setResult(RESULT_OK, intent);
-        finish();//结束当前的activity的生命周期
-    }
-
-    private Context getContext() {
-        return this;
-    }
 }

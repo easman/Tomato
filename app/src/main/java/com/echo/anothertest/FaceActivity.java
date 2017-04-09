@@ -402,7 +402,7 @@ public class FaceActivity extends AppCompatActivity
                 if (!TextUtils.isEmpty(s)) {
                     if (Integer.parseInt(s.toString()) > 120) {
                         inputWorkMinutes.setText("120");
-                    } else if (Integer.parseInt(s.toString()) < 120) {
+                    } else if (Integer.parseInt(s.toString()) < 1) {
                         inputWorkMinutes.setText("1");
                     }
                 }

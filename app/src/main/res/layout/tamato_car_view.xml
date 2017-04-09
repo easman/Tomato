@@ -68,7 +68,7 @@
             <ImageView
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_tomato_f"
+                android:src="@drawable/ic_tomato_1p"
                 android:gravity="center"
                 android:padding="15dp"
                 />
