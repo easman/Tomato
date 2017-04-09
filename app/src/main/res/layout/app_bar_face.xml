@@ -6,12 +6,14 @@
     android:layout_height="match_parent"
     tools:context="com.echo.anothertest.FaceActivity">
 
-    <View
+    <TextView
         android:id="@+id/background_face_activity"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#e1e1e1"
-        android:visibility="gone"/>
+        android:text="点击右下角按钮添加番茄"
+        android:gravity="center"
+        android:textSize="25sp"
+        android:textColor="#E1E1E1"/>
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"

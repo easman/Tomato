@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -30,6 +31,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -50,7 +52,7 @@ public class FaceActivity extends AppCompatActivity {
     private List<Tomato> tomatos = new ArrayList<Tomato>();
     private PopupWindow creatTomatoWindow;
     private View contentViewPop;
-    private View backgroundFace;
+    private TextView backgroundFace;
     private Toolbar toolbar;
     private FloatingActionButton fab;
     private boolean isEditMode;
@@ -63,7 +65,7 @@ public class FaceActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("番茄堆");
         setSupportActionBar(toolbar);
-        backgroundFace = findViewById(R.id.background_face_activity);
+        backgroundFace = (TextView) findViewById(R.id.background_face_activity);
 
         //设置右下角新建按钮功能
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -181,16 +183,6 @@ public class FaceActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         if (resultCode == RESULT_OK) {
@@ -215,19 +207,23 @@ public class FaceActivity extends AppCompatActivity {
             case R.id.action_settings:
                 if (isEditMode) {
                     isEditMode = false;
-                    item.setIcon(R.drawable.ic_menu_manage);
+                    item.setIcon(R.drawable.ic_edit);
                     toolbar.setTitle("番茄堆");
                     toolbar.setAlpha(1f);
-                    backgroundFace.setVisibility(View.GONE);
+                    backgroundFace.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                    if (tomatos.size() == 0) {
+                        backgroundFace.setText("点击右下角按钮添加番茄");
+                    }
                     AnimationSet animationSet = (AnimationSet) AnimationUtils.loadAnimation(FaceActivity.this, R.anim.show);
                     fab.startAnimation(animationSet);
                     fab.setVisibility(View.VISIBLE);
                 } else {
                     isEditMode = true;
-                    item.setIcon(R.drawable.ic_menu_gallery);
+                    item.setIcon(R.drawable.ic_back);
                     toolbar.setTitle("编辑模式");
                     toolbar.setAlpha(0.5f);
-                    backgroundFace.setVisibility(View.VISIBLE);
+                    backgroundFace.setBackgroundColor(Color.parseColor("#E1E1E1"));
+                    backgroundFace.setText("");
                     AnimationSet animationSet = (AnimationSet) AnimationUtils.loadAnimation(FaceActivity.this, R.anim.hide);
                     fab.startAnimation(animationSet);
                     fab.setVisibility(View.GONE);
@@ -249,9 +245,11 @@ public class FaceActivity extends AppCompatActivity {
             String content = sb.toString().substring(0, sb.length() - 1);
             editor.putString(getString(R.string.card_list), content);
             editor.commit();
+            backgroundFace.setText("");
         } else {
             editor.clear();
             editor.commit();
+            backgroundFace.setText("点击右下角按钮添加番茄");
         }
         if (tomatos.size() >= 4) {
             fab.setAlpha(0.5f);
@@ -266,12 +264,14 @@ public class FaceActivity extends AppCompatActivity {
         String content = sp.getString(getString(R.string.card_list), null);
 
         if (content != null) {
+            backgroundFace.setText("");
             String[] tomatoStrings = content.split(",");
             for (String string :
                     tomatoStrings) {
-
                 tomatos.add(SerializableHelper.getTomatoFromShare(string));
             }
+        } else {
+            backgroundFace.setText("点击右下角按钮添加番茄");
         }
     }
 
