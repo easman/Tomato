@@ -257,20 +257,8 @@ public class AlarmActivity extends Activity {
             timerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    mCurrentProgress += 20;
-                    watchHandler.sendEmptyMessage(MSG_TIME_TICK_UI);
-                    if (mCurrentProgress % 1000 == 0) {
-                        handler.sendEmptyMessage(MSG_TIME_TICK);
-                    }
-                    if (mCurrentProgress >= mTotalProgress) {
-                        stopTimer();
-                        handler.sendEmptyMessage(MSG_TIME_IS_UP);
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                    handler.sendEmptyMessage(MSG_TIME_TICK_UI);
+                    handler.sendEmptyMessage(MSG_TIME_TICK);
                 }
             };
             timer.schedule(timerTask, 0, 20);//每隔20ms执行一次
@@ -436,13 +424,29 @@ public class AlarmActivity extends Activity {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case MSG_TIME_IS_UP:
-                    timeIsUpEvent();
+                case MSG_TIME_TICK_UI:
+                    mCurrentProgress += 20;
+                    if (isTouchPause) {
+                        mTasksView.setProgressWithStroke(mTotalProgress - mCurrentProgress);
+                    } else {
+                        mTasksView.setProgress(mTotalProgress - mCurrentProgress);
+                    }
+                    if (mCurrentProgress >= mTotalProgress) {
+                        stopTimer();
+                        timeIsUpEvent();
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     break;
                 case MSG_TIME_TICK:
-                    int minute = (mTotalProgress - mCurrentProgress) / 1000 / 60;
-                    int second = (mTotalProgress - mCurrentProgress) / 1000 % 60;
-                    txCounter.setText(minute + ":" + df.format(second));
+                    if (mCurrentProgress % 1000 == 0) {
+                        int minute = (mTotalProgress - mCurrentProgress) / 1000 / 60;
+                        int second = (mTotalProgress - mCurrentProgress) / 1000 % 60;
+                        txCounter.setText(minute + ":" + df.format(second));
+                    }
                     break;
                 case MSG_PRESS_BACK_BUTTON:
                     stopTimer();
@@ -466,18 +470,4 @@ public class AlarmActivity extends Activity {
         }
     };
 
-    //设置更新表盘的Handler
-    private Handler watchHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_TIME_TICK_UI:
-                    if (isTouchPause) {
-                        mTasksView.setProgressWithStroke(mTotalProgress - mCurrentProgress);
-                    } else {
-                        mTasksView.setProgress(mTotalProgress - mCurrentProgress);
-                    }
-            }
-        }
-    };
 }
