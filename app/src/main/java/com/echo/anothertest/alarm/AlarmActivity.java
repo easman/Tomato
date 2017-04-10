@@ -1,20 +1,30 @@
-package com.echo.anothertest;
+package com.echo.anothertest.alarm;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
+import android.os.PowerManager;
 import android.os.Vibrator;
+import android.support.annotation.IntDef;
+import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.echo.anothertest.R;
+import com.echo.anothertest.utils.SerializableHelper;
+import com.echo.anothertest.bean.Tomato;
 
 import java.text.DecimalFormat;
 import java.util.Timer;
@@ -24,7 +34,7 @@ import java.util.TimerTask;
  * Created by Echo
  */
 
-public class MainActivity extends Activity {
+public class AlarmActivity extends Activity {
 
     private static final int MSG_TIME_IS_UP = 1;
     private static final int MSG_TIME_TICK = 2;
@@ -58,6 +68,8 @@ public class MainActivity extends Activity {
     private Timer timer = new Timer();
     private TimerTask timerTask = null;
     private DecimalFormat df = new DecimalFormat();
+
+    private PowerManager.WakeLock wakeLock;
 
     /*
     创建Activity
@@ -234,7 +246,14 @@ public class MainActivity extends Activity {
     开启计时器方法
      */
     public void startTimer() {
+
         if (timerTask == null) {
+
+            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+            wakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK
+                    | PowerManager.ON_AFTER_RELEASE, "DPA");
+            wakeLock.acquire();
+
             timerTask = new TimerTask() {
                 @Override
                 public void run() {
@@ -254,7 +273,7 @@ public class MainActivity extends Activity {
                     }
                 }
             };
-            timer.schedule(timerTask, 0, 20);//每隔10ms执行一次
+            timer.schedule(timerTask, 0, 20);//每隔20ms执行一次
         }
     }
 
@@ -265,6 +284,10 @@ public class MainActivity extends Activity {
         if (timerTask != null) {
             timerTask.cancel();
             timerTask = null;
+
+            //停止唤醒CPU
+            wakeLock.release();
+
         }
     }
 
@@ -373,6 +396,7 @@ public class MainActivity extends Activity {
     番茄终止时的处理方法
      */
     private void endTomato() {
+
         //对tomato对象标记完成状况
         if (currentTomatoNumber == (double) totleTomatoRepeat - 0.5) {
             numberOfFinish++;
@@ -390,9 +414,12 @@ public class MainActivity extends Activity {
         String tomatoString = SerializableHelper.setTomatoToShare(tomato);
         Intent intent = new Intent();
         intent.putExtra("tomato_back", tomatoString);
+
         //通过Intent对象返回结果，调用setResult方法
         setResult(RESULT_OK, intent);
-        finish();//结束当前的activity的生命周期
+
+        //结束当前的activity的生命周期
+        finish();
     }
 
     /*
@@ -419,7 +446,7 @@ public class MainActivity extends Activity {
                     break;
                 case MSG_PRESS_BACK_BUTTON:
                     stopTimer();
-                    new AlertDialog.Builder(MainActivity.this).setCancelable(false).setMessage("你确定要结束这个番茄吗").setPositiveButton("结束番茄", new DialogInterface.OnClickListener() {
+                    new AlertDialog.Builder(AlarmActivity.this).setCancelable(false).setMessage("你确定要结束这个番茄吗").setPositiveButton("结束番茄", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             endTomato();
@@ -440,7 +467,7 @@ public class MainActivity extends Activity {
     };
 
     //设置更新表盘的Handler
-    Handler watchHandler = new Handler() {
+    private Handler watchHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {

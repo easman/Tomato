@@ -1,4 +1,4 @@
-package com.echo.anothertest;
+package com.echo.anothertest.alarm;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -8,6 +8,8 @@ import android.graphics.RectF;
 import android.support.annotation.ColorInt;
 import android.util.AttributeSet;
 import android.view.View;
+
+import com.echo.anothertest.R;
 
 /**
  * Created by Echo

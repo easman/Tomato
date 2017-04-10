@@ -1,4 +1,4 @@
-package com.echo.anothertest;
+package com.echo.anothertest.Main;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -6,8 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
+
+import com.echo.anothertest.R;
+import com.echo.anothertest.bean.Tomato;
 
 import java.util.List;
 

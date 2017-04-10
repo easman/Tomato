@@ -1,4 +1,4 @@
-package com.echo.anothertest;
+package com.echo.anothertest.bean;
 
 import java.io.Serializable;
 

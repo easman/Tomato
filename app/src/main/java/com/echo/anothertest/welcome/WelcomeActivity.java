@@ -1,4 +1,4 @@
-package com.echo.anothertest;
+package com.echo.anothertest.welcome;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,11 +6,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+
+import com.echo.anothertest.R;
+import com.echo.anothertest.Main.MainActivity;
+import com.echo.anothertest.utils.DecodeBitmapHelper;
 
 /**
  * Created by Echo
@@ -51,7 +54,7 @@ public class WelcomeActivity extends Activity {
             editor.apply();
             intent = new Intent(WelcomeActivity.this, GuideActivity.class);
         } else {
-            intent = new Intent(WelcomeActivity.this, FaceActivity.class);
+            intent = new Intent(WelcomeActivity.this, MainActivity.class);
         }
         Handler handler = new Handler();
         //当计时结束,跳转至主界面

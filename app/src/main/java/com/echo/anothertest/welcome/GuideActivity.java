@@ -1,4 +1,4 @@
-package com.echo.anothertest;
+package com.echo.anothertest.welcome;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,6 +14,10 @@ import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import com.echo.anothertest.R;
+import com.echo.anothertest.Main.MainActivity;
+import com.echo.anothertest.utils.DecodeBitmapHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,7 +114,7 @@ public class GuideActivity extends Activity {
     }
 
     private void openHome() {
-        Intent intent = new Intent(getApplicationContext(), FaceActivity.class);
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
         finish();
     }

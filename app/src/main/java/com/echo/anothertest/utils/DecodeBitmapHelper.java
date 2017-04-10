@@ -1,4 +1,4 @@
-package com.echo.anothertest;
+package com.echo.anothertest.utils;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;

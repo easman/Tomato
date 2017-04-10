@@ -1,4 +1,4 @@
-package com.echo.anothertest;
+package com.echo.anothertest.Main;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -7,7 +7,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 /**
- * Created by Echo on 2017/4/3.
+ * Created by Echo
  */
 
 public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {

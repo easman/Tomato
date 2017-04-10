@@ -6,9 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark"
-    tools:context="com.echo.anothertest.MainActivity">
+    tools:context="com.echo.anothertest.alarm.AlarmActivity">
 
-    <com.echo.anothertest.TasksCompletedView
+    <com.echo.anothertest.alarm.TasksCompletedView
         android:id="@+id/tasks_view"
         android:layout_width="350dp"
         android:layout_height="350dp"

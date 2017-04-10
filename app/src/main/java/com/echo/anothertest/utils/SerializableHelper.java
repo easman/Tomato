@@ -1,6 +1,8 @@
-package com.echo.anothertest;
+package com.echo.anothertest.utils;
 
 import android.util.Base64;
+
+import com.echo.anothertest.bean.Tomato;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

@@ -1,4 +1,4 @@
-package com.echo.anothertest;
+package com.echo.anothertest.Main;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -18,8 +18,6 @@ import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -31,11 +29,15 @@ import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.echo.anothertest.R;
+import com.echo.anothertest.alarm.AlarmActivity;
+import com.echo.anothertest.bean.Tomato;
+import com.echo.anothertest.utils.SerializableHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,7 +47,7 @@ import java.util.List;
  * Created by Echo
  */
 
-public class FaceActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private MyAdapter myAdapter;
@@ -146,11 +148,11 @@ public class FaceActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, final int position) {
                 if (!isEditMode) {
-                    new AlertDialog.Builder(FaceActivity.this).setMessage("你要开始这堆番茄吗？").setNegativeButton("是的，我要开始", new DialogInterface.OnClickListener() {
+                    new AlertDialog.Builder(MainActivity.this).setMessage("你要开始这堆番茄吗？").setNegativeButton("是的，我要开始", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             String tomatoString = SerializableHelper.setTomatoToShare(tomatos.get(position));
-                            Intent intent = new Intent(FaceActivity.this, MainActivity.class);
+                            Intent intent = new Intent(MainActivity.this, AlarmActivity.class);
                             intent.putExtra("tomato", tomatoString);
                             startActivityForResult(intent, position); //使用位置作为结果码，便于结束后更新数据
                         }
@@ -161,7 +163,7 @@ public class FaceActivity extends AppCompatActivity {
             @Override
             public void onItemLongClick(View view, final int position) {
                 if (!isEditMode) {
-                    new AlertDialog.Builder(FaceActivity.this).setMessage("你想要删除这堆番茄吗").setNegativeButton("是的，我要删除", new DialogInterface.OnClickListener() {
+                    new AlertDialog.Builder(MainActivity.this).setMessage("你想要删除这堆番茄吗").setNegativeButton("是的，我要删除", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             tomatos.remove(position);
@@ -229,7 +231,7 @@ public class FaceActivity extends AppCompatActivity {
 
     //存储数据
     private void saveTomatoList() {
-        SharedPreferences.Editor editor = getSharedPreferences(FaceActivity.class.getName(), Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = getSharedPreferences(MainActivity.class.getName(), Context.MODE_PRIVATE).edit();
         if (myAdapter.getItemCount() != 0) {
             //使用类名来命名SharedPreferences
             StringBuffer sb = new StringBuffer();
@@ -254,7 +256,7 @@ public class FaceActivity extends AppCompatActivity {
 
     //读取数据
     private void readSavedTomatoList() {
-        SharedPreferences sp = getSharedPreferences(FaceActivity.class.getName(), Context.MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences(MainActivity.class.getName(), Context.MODE_PRIVATE);
         String content = sp.getString(getString(R.string.card_list), null);
 
         if (content != null) {
@@ -461,7 +463,7 @@ public class FaceActivity extends AppCompatActivity {
         toolbar.setAlpha(0.5f);
         backgroundFace.setBackgroundColor(Color.parseColor("#E1E1E1"));
         backgroundFace.setText("");
-        AnimationSet animationSet = (AnimationSet) AnimationUtils.loadAnimation(FaceActivity.this, R.anim.hide);
+        AnimationSet animationSet = (AnimationSet) AnimationUtils.loadAnimation(MainActivity.this, R.anim.hide);
         fab.startAnimation(animationSet);
         fab.setVisibility(View.GONE);
     }
@@ -475,7 +477,7 @@ public class FaceActivity extends AppCompatActivity {
         if (tomatos.size() == 0) {
             backgroundFace.setText("点击右下角按钮添加番茄");
         }
-        AnimationSet animationSet = (AnimationSet) AnimationUtils.loadAnimation(FaceActivity.this, R.anim.show);
+        AnimationSet animationSet = (AnimationSet) AnimationUtils.loadAnimation(MainActivity.this, R.anim.show);
         fab.startAnimation(animationSet);
         fab.setVisibility(View.VISIBLE);
     }
