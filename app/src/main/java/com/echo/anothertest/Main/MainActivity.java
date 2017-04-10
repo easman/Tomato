@@ -78,21 +78,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        //设置滑出菜单
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-//        drawer.setDrawerListener(toggle);
-//        toggle.syncState();
-
-//        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-//        navigationView.setNavigationItemSelectedListener(this);
-
-
         mRecyclerView = (RecyclerView) findViewById(R.id.tomato_list);       // 拿到RecyclerView
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));       // 设置LinearLayoutManager
-//        mRecyclerView.setItemAnimator(new DefaultItemAnimator());            // 设置ItemAnimator
-//        mRecyclerView.setHasFixedSize(true);                                 // 设置固定大小
         myAdapter = new MyAdapter(this, tomatos);                            // 初始化自定义的适配器
         mRecyclerView.setAdapter(myAdapter);                                 // 为mRecyclerView设置适配器
         readSavedTomatoList();

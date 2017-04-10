@@ -14,7 +14,6 @@ public class DecodeBitmapHelper {
         // 设置原图大小
         final int height = options.outHeight;
         final int width = options.outWidth;
-        System.out.println(height + " " + width);
         int inSampleSize = 1;
 
         if (height > reqHeight || width > reqWidth) {
@@ -28,7 +27,6 @@ public class DecodeBitmapHelper {
                 inSampleSize *= 2;
             }
         }
-        System.out.println(inSampleSize);
         return inSampleSize;
     }
 
