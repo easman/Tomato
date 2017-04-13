@@ -1,22 +1,19 @@
 package com.echo.anothertest.alarm;
 
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.Vibrator;
-import android.support.annotation.IntDef;
-import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -37,9 +34,8 @@ import java.util.TimerTask;
 public class AlarmActivity extends Activity {
 
     private static final int MSG_TIME_IS_UP = 1;
-    private static final int MSG_TIME_TICK = 2;
-    private static final int MSG_TIME_TICK_UI = 3;
-    private static final int MSG_PRESS_BACK_BUTTON = 4;
+    private static final int MSG_TIME_TICK_UI = 2;
+    private static final int MSG_PRESS_BACK_BUTTON = 3;
     private static final int WORK_TIME_SITUATION = 10;
     private static final int BREAK_TIME_SITUATION = 11;
 
@@ -52,6 +48,7 @@ public class AlarmActivity extends Activity {
     private int numberOfUnfinish;
     private String jobDescription;
     private boolean isSound, isWave;
+    private boolean screenOn;
 
 
     //运行中调用参数
@@ -65,10 +62,15 @@ public class AlarmActivity extends Activity {
     private TasksCompletedView mTasksView;
     private TextView tx1, tx2, txStart, txNumber, txCounter;
     private ImageView soundClicker, waveClicker;
+
     private Timer timer = new Timer();
     private TimerTask timerTask = null;
-    private DecimalFormat df = new DecimalFormat();
 
+    private DecimalFormat df = new DecimalFormat();
+    private IntentFilter screenTurnOnIntentFilter;
+    private IntentFilter screenTurnOffIntentFilter;
+    private ScreenTurnOnReceiver screenTurnOnReceiver;
+    private ScreenTurnOffReceiver screenTurnOffReceiver;
     private PowerManager.WakeLock wakeLock;
 
     /*
@@ -78,6 +80,16 @@ public class AlarmActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //注册广播接收器，监听屏幕状况
+        screenTurnOnIntentFilter = new IntentFilter();
+        screenTurnOffIntentFilter = new IntentFilter();
+        screenTurnOnReceiver = new ScreenTurnOnReceiver();
+        screenTurnOffReceiver = new ScreenTurnOffReceiver();
+        screenTurnOnIntentFilter.addAction(Intent.ACTION_USER_PRESENT);
+        screenTurnOffIntentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+        registerReceiver(screenTurnOnReceiver, screenTurnOnIntentFilter);
+        registerReceiver(screenTurnOffReceiver, screenTurnOffIntentFilter);
 
         //提取intent中的tomato对象
         Intent intent = getIntent();
@@ -178,8 +190,19 @@ public class AlarmActivity extends Activity {
     }
 
     /*
-    重写onBackPressed，更改返回键功能
+    重写onDestory，释放广播资源
      */
+
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(screenTurnOnReceiver);
+        unregisterReceiver(screenTurnOffReceiver);
+        super.onDestroy();
+    }
+
+    /*
+        重写onBackPressed，更改返回键功能
+         */
     @Override
     public void onBackPressed() {
         handler.sendEmptyMessage(MSG_PRESS_BACK_BUTTON);
@@ -200,6 +223,7 @@ public class AlarmActivity extends Activity {
 
         isRunning = false;
         isTouchPause = false;
+        screenOn = true;
         currentTomatoNumber = 0;
         currentSituation = WORK_TIME_SITUATION;
         mTotalProgress = workMinutes;
@@ -257,8 +281,13 @@ public class AlarmActivity extends Activity {
             timerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    handler.sendEmptyMessage(MSG_TIME_TICK_UI);
-                    handler.sendEmptyMessage(MSG_TIME_TICK);
+                    mCurrentProgress += 20;
+                    if (screenOn) {
+                        handler.sendEmptyMessage(MSG_TIME_TICK_UI);
+                    }
+                    if (mCurrentProgress >= mTotalProgress) {
+                        handler.sendEmptyMessage(MSG_TIME_IS_UP);
+                    }
                 }
             };
             timer.schedule(timerTask, 0, 20);//每隔20ms执行一次
@@ -425,28 +454,18 @@ public class AlarmActivity extends Activity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_TIME_TICK_UI:
-                    mCurrentProgress += 20;
                     if (isTouchPause) {
                         mTasksView.setProgressWithStroke(mTotalProgress - mCurrentProgress);
                     } else {
                         mTasksView.setProgress(mTotalProgress - mCurrentProgress);
                     }
-                    if (mCurrentProgress >= mTotalProgress) {
-                        stopTimer();
-                        timeIsUpEvent();
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                    int minute = (mTotalProgress - mCurrentProgress) / 1000 / 60;
+                    int second = (mTotalProgress - mCurrentProgress) / 1000 % 60;
+                    txCounter.setText(minute + ":" + df.format(second));
                     break;
-                case MSG_TIME_TICK:
-                    if (mCurrentProgress % 1000 == 0) {
-                        int minute = (mTotalProgress - mCurrentProgress) / 1000 / 60;
-                        int second = (mTotalProgress - mCurrentProgress) / 1000 % 60;
-                        txCounter.setText(minute + ":" + df.format(second));
-                    }
+                case MSG_TIME_IS_UP:
+                    stopTimer();
+                    timeIsUpEvent();
                     break;
                 case MSG_PRESS_BACK_BUTTON:
                     stopTimer();
@@ -470,4 +489,17 @@ public class AlarmActivity extends Activity {
         }
     };
 
+    class ScreenTurnOffReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            screenOn = false;
+        }
+    }
+
+    class ScreenTurnOnReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            screenOn = true;
+        }
+    }
 }
