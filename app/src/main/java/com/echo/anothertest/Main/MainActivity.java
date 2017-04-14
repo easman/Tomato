@@ -36,7 +36,7 @@ import android.widget.Toast;
 
 import com.echo.anothertest.R;
 import com.echo.anothertest.alarm.AlarmActivity;
-import com.echo.anothertest.bean.Tomato;
+import com.echo.anothertest.bean.Pomodori;
 import com.echo.anothertest.utils.SerializableHelper;
 
 import java.util.ArrayList;
@@ -51,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private MyAdapter myAdapter;
-    private List<Tomato> tomatos = new ArrayList<Tomato>();
-    private PopupWindow creatTomatoWindow;
+    private List<Pomodori> pomodoris = new ArrayList<Pomodori>();
+    private PopupWindow creatPomodoriWindow;
     private View contentViewPop;
     private TextView backgroundFace;
     private Toolbar toolbar;
@@ -78,14 +78,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.tomato_list);       // 拿到RecyclerView
+        mRecyclerView = (RecyclerView) findViewById(R.id.pomodori_list);       // 拿到RecyclerView
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));       // 设置LinearLayoutManager
-        myAdapter = new MyAdapter(this, tomatos);                            // 初始化自定义的适配器
+        myAdapter = new MyAdapter(this, pomodoris);                            // 初始化自定义的适配器
         mRecyclerView.setAdapter(myAdapter);                                 // 为mRecyclerView设置适配器
-        readSavedTomatoList();
+        readSavedPomodoriList();
 
         //避免添加按钮遮挡卡片内容
-        if (tomatos.size() >= 4) {
+        if (pomodoris.size() >= 4) {
             fab.setAlpha(0.5f);
         } else {
             fab.setAlpha(1f);
@@ -104,18 +104,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                 //滑动事件
-                Collections.swap(tomatos, viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                Collections.swap(pomodoris, viewHolder.getAdapterPosition(), target.getAdapterPosition());
                 myAdapter.notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
-                saveTomatoList();
+                savePomodoriList();
                 return false;
             }
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 //侧滑事件
-                tomatos.remove(viewHolder.getAdapterPosition());
+                pomodoris.remove(viewHolder.getAdapterPosition());
                 myAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
-                saveTomatoList();
+                savePomodoriList();
             }
 
             @Override
@@ -138,9 +138,9 @@ public class MainActivity extends AppCompatActivity {
                     new AlertDialog.Builder(MainActivity.this).setMessage("你要开始这堆番茄吗？").setNegativeButton("是的，我要开始", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            String tomatoString = SerializableHelper.setTomatoToShare(tomatos.get(position));
+                            String pomodoriString = SerializableHelper.setPomodoriToShare(pomodoris.get(position));
                             Intent intent = new Intent(MainActivity.this, AlarmActivity.class);
-                            intent.putExtra("tomato", tomatoString);
+                            intent.putExtra("pomodori", pomodoriString);
                             startActivityForResult(intent, position); //使用位置作为结果码，便于结束后更新数据
                         }
                     }).setPositiveButton("不，我要再想想", null).show();
@@ -153,11 +153,11 @@ public class MainActivity extends AppCompatActivity {
                     new AlertDialog.Builder(MainActivity.this).setMessage("你想要删除这堆番茄吗").setNegativeButton("是的，我要删除", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            tomatos.remove(position);
-                            saveTomatoList();
+                            pomodoris.remove(position);
+                            savePomodoriList();
                             mRecyclerView.scrollToPosition(position);
                             myAdapter.notifyDataSetChanged();
-                            if (tomatos.size() >= 4) {
+                            if (pomodoris.size() >= 4) {
                                 fab.setAlpha(0.5f);
                             } else {
                                 fab.setAlpha(1f);
@@ -175,9 +175,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         if (resultCode == RESULT_OK) {
-            Tomato tomato = SerializableHelper.getTomatoFromShare(intent.getStringExtra("tomato_back")); //反序列化tomato结果
-            tomatos.set(requestCode, tomato);
-            saveTomatoList();
+            Pomodori pomodori = SerializableHelper.getPomodoriFromShare(intent.getStringExtra("pomodori_back")); //反序列化pomodori结果
+            pomodoris.set(requestCode, pomodori);
+            savePomodoriList();
             myAdapter.notifyDataSetChanged();
         }
 //        }
@@ -217,13 +217,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //存储数据
-    private void saveTomatoList() {
+    private void savePomodoriList() {
         SharedPreferences.Editor editor = getSharedPreferences(MainActivity.class.getName(), Context.MODE_PRIVATE).edit();
         if (myAdapter.getItemCount() != 0) {
             //使用类名来命名SharedPreferences
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i < myAdapter.getItemCount(); i++) {
-                sb.append(SerializableHelper.setTomatoToShare(tomatos.get(i))).append(",");
+                sb.append(SerializableHelper.setPomodoriToShare(pomodoris.get(i))).append(",");
             }
             String content = sb.toString().substring(0, sb.length() - 1);
             editor.putString(getString(R.string.card_list), content);
@@ -234,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
             editor.commit();
             backgroundFace.setText("点击右下角按钮添加番茄");
         }
-        if (tomatos.size() >= 4) {
+        if (pomodoris.size() >= 4) {
             fab.setAlpha(0.5f);
         } else {
             fab.setAlpha(1f);
@@ -242,16 +242,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //读取数据
-    private void readSavedTomatoList() {
+    private void readSavedPomodoriList() {
         SharedPreferences sp = getSharedPreferences(MainActivity.class.getName(), Context.MODE_PRIVATE);
         String content = sp.getString(getString(R.string.card_list), null);
 
         if (content != null) {
             backgroundFace.setText("");
-            String[] tomatoStrings = content.split(",");
+            String[] pomodoriStrings = content.split(",");
             for (String string :
-                    tomatoStrings) {
-                tomatos.add(SerializableHelper.getTomatoFromShare(string));
+                    pomodoriStrings) {
+                pomodoris.add(SerializableHelper.getPomodoriFromShare(string));
             }
         } else {
             backgroundFace.setText("点击右下角按钮添加番茄");
@@ -260,10 +260,10 @@ public class MainActivity extends AppCompatActivity {
 
     //自定义新建设置界面
     private void showCreatWindow(View parent) {
-        if (creatTomatoWindow == null) {
+        if (creatPomodoriWindow == null) {
             LayoutInflater mLayoutInflater = LayoutInflater.from(this);
             contentViewPop = mLayoutInflater.inflate(R.layout.popup_setting, null);
-            creatTomatoWindow = new PopupWindow(contentViewPop, ViewGroup.LayoutParams.WRAP_CONTENT,
+            creatPomodoriWindow = new PopupWindow(contentViewPop, ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
         }
 
@@ -271,15 +271,15 @@ public class MainActivity extends AppCompatActivity {
         final EditText inputJobDescription = (EditText) contentViewPop.findViewById(R.id.input_job_description);
         final EditText inputWorkMinutes = (EditText) contentViewPop.findViewById(R.id.input_work_minutes);
         final EditText inputBreakMinutes = (EditText) contentViewPop.findViewById(R.id.input_break_minutes);
-        final SeekBar seekTomatoRepeat = (SeekBar) contentViewPop.findViewById(R.id.seek_tomato_repeat);
-        final TextView showTomatoRepeat = (TextView) contentViewPop.findViewById(R.id.show_tomato_repeat);
+        final SeekBar seekPomodoriRepeat = (SeekBar) contentViewPop.findViewById(R.id.seek_pomodori_repeat);
+        final TextView showPomodoriRepeat = (TextView) contentViewPop.findViewById(R.id.show_pomodori_repeat);
         final Switch switchSound = (Switch) contentViewPop.findViewById(R.id.switch_sound);
         final Switch switchWave = (Switch) contentViewPop.findViewById(R.id.switch_wave);
-        TextView creatTomato = (TextView) contentViewPop.findViewById(R.id.click_to_creat_tomato);
+        TextView creatPomodori = (TextView) contentViewPop.findViewById(R.id.click_to_creat_pomodori);
         Switch switchDefaultSetting = (Switch) contentViewPop.findViewById(R.id.switch_default_setting);
 
         //“创建”按钮的监听事件
-        creatTomato.setOnClickListener(new View.OnClickListener() {
+        creatPomodori.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //检查空值
@@ -299,18 +299,18 @@ public class MainActivity extends AppCompatActivity {
                     Toast toast = Toast.makeText(getApplicationContext(), stShow, Toast.LENGTH_SHORT);
                     toast.show();
                 } else {
-                    Tomato currentTomato = new Tomato(Integer.parseInt(inputWorkMinutes.getText().toString()),
+                    Pomodori currentPomodori = new Pomodori(Integer.parseInt(inputWorkMinutes.getText().toString()),
                             Integer.parseInt(inputBreakMinutes.getText().toString()),
-                            seekTomatoRepeat.getProgress() + 1,
+                            seekPomodoriRepeat.getProgress() + 1,
                             inputJobDescription.getText().toString(),
                             switchSound.isChecked(),
                             switchWave.isChecked());
-                    tomatos.add(currentTomato);
-                    saveTomatoList();
+                    pomodoris.add(currentPomodori);
+                    savePomodoriList();
                     mRecyclerView.scrollToPosition(myAdapter.getItemCount() - 1);
                     myAdapter.notifyDataSetChanged();
-                    creatTomatoWindow.dismiss();
-                    creatTomatoWindow = null;
+                    creatPomodoriWindow.dismiss();
+                    creatPomodoriWindow = null;
                 }
             }
         });
@@ -322,22 +322,22 @@ public class MainActivity extends AppCompatActivity {
                 if (isChecked) {
                     inputWorkMinutes.setEnabled(false);
                     inputBreakMinutes.setEnabled(false);
-                    seekTomatoRepeat.setEnabled(false);
+                    seekPomodoriRepeat.setEnabled(false);
                 } else {
                     inputWorkMinutes.setEnabled(true);
                     inputBreakMinutes.setEnabled(true);
-                    seekTomatoRepeat.setEnabled(true);
+                    seekPomodoriRepeat.setEnabled(true);
                 }
             }
         });
 
         //显示当前选择的番茄个数
-        seekTomatoRepeat.setEnabled(false);
-        seekTomatoRepeat.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        seekPomodoriRepeat.setEnabled(false);
+        seekPomodoriRepeat.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 String st = (progress + 1) + "个";
-                showTomatoRepeat.setText(st);
+                showPomodoriRepeat.setText(st);
             }
 
             @Override
@@ -419,18 +419,18 @@ public class MainActivity extends AppCompatActivity {
 
         //设置外部可点击dismiss
         ColorDrawable cd = new ColorDrawable(0x000000);
-        creatTomatoWindow.setBackgroundDrawable(cd);
-        creatTomatoWindow.setOutsideTouchable(true);
-        creatTomatoWindow.setFocusable(true);
+        creatPomodoriWindow.setBackgroundDrawable(cd);
+        creatPomodoriWindow.setOutsideTouchable(true);
+        creatPomodoriWindow.setFocusable(true);
 
         //设置动画
-        creatTomatoWindow.setAnimationStyle(R.style.popwin_anim_style);
+        creatPomodoriWindow.setAnimationStyle(R.style.popwin_anim_style);
 
         //设置显示位置为屏幕中央
-        creatTomatoWindow.showAtLocation((View) parent.getParent(), Gravity.CENTER, 0, 0);
+        creatPomodoriWindow.showAtLocation((View) parent.getParent(), Gravity.CENTER, 0, 0);
 
         //设置dismiss时功能
-        creatTomatoWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+        creatPomodoriWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
 
             //在dismiss中恢复透明度
             public void onDismiss() {
@@ -461,7 +461,7 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setTitle("番茄堆");
         toolbar.setAlpha(1f);
         backgroundFace.setBackgroundColor(Color.parseColor("#FFFFFF"));
-        if (tomatos.size() == 0) {
+        if (pomodoris.size() == 0) {
             backgroundFace.setText("点击右下角按钮添加番茄");
         }
         AnimationSet animationSet = (AnimationSet) AnimationUtils.loadAnimation(MainActivity.this, R.anim.show);

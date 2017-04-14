@@ -6,27 +6,27 @@ import java.io.Serializable;
  * Created by Echo
  */
 
-public class Tomato implements Serializable {
+public class Pomodori implements Serializable {
     private static final long serialVersionUID = -8806993886819372269L;
     private int workMinutes;
     private int breakMinutes;
-    private int totleTamatoRepeat;
+    private int totlePomodoriRepeat;
     private String jobDescription;
     private int numberOfFinish;
     private int numberOfUnfinish;
     private boolean existSituation;
     private boolean isSound = true;
-    private boolean isWave = true;
+    private boolean isVibrate = true;
 
-    public Tomato(int workMinutes, int breakMinutes, int totleTamatoRepeat, String jobDescription,boolean isSound,boolean isWave) {
+    public Pomodori(int workMinutes, int breakMinutes, int totlePomodoriRepeat, String jobDescription, boolean isSound, boolean isVibrate) {
         this.breakMinutes = breakMinutes;
         this.workMinutes = workMinutes;
-        this.totleTamatoRepeat = totleTamatoRepeat;
+        this.totlePomodoriRepeat = totlePomodoriRepeat;
         this.jobDescription = jobDescription;
         this.numberOfFinish = 0;
         this.numberOfUnfinish = 0;
         this.isSound = isSound;
-        this.isWave = isWave;
+        this.isVibrate = isVibrate;
         this.existSituation = true;
 
     }
@@ -39,12 +39,12 @@ public class Tomato implements Serializable {
         isSound = sound;
     }
 
-    public boolean isWave() {
-        return isWave;
+    public boolean isVibrate() {
+        return isVibrate;
     }
 
-    public void setWave(boolean wave) {
-        isWave = wave;
+    public void setVibrate(boolean vibrate) {
+        isVibrate = vibrate;
     }
 
     public int getWorkMinutes() {
@@ -63,12 +63,12 @@ public class Tomato implements Serializable {
         this.breakMinutes = breakMinutes;
     }
 
-    public int getTotleTamatoRepeat() {
-        return totleTamatoRepeat;
+    public int getTotlePomodoriRepeat() {
+        return totlePomodoriRepeat;
     }
 
-    public void setTotleTamatoRepeat(int totleTamatoRepeat) {
-        this.totleTamatoRepeat = totleTamatoRepeat;
+    public void setTotlePomodoriRepeat(int totlePomodoriRepeat) {
+        this.totlePomodoriRepeat = totlePomodoriRepeat;
     }
 
     public String getJobDescription() {

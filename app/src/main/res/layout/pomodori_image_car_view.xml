@@ -46,7 +46,7 @@
                 android:textSize="12sp" />
 
             <TextView
-                android:id="@+id/card_totle_tomato_repeat"
+                android:id="@+id/card_totle_pomodori_repeat"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="3dp"
@@ -66,24 +66,24 @@
             android:background="#ffd2c9">
 
             <ImageView
+                android:id="@+id/pomodori_image"
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_tomato_1p"
+                android:src="@drawable/ic_pomodori_0"
                 android:gravity="center"
-                android:padding="15dp"
-                />
+                android:padding="15dp" />
 
             <TextView
                 android:id="@+id/job_decription"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:gravity="left|center_vertical"
+                android:gravity="start|center_vertical"
                 android:paddingStart="20dp"
-                android:text="here it is"
+                android:text="@string/testvalue"
                 android:textSize="18sp" />
             <LinearLayout
-                android:layout_width="100dp"
+                android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
@@ -92,8 +92,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="0.5"
-                    android:gravity="left|center_vertical"
-                    android:text="here it is" />
+                    android:layout_marginRight="5dp"
+                    android:gravity="center"
+                    android:text="@string/testvalue" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -106,8 +107,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="0.5"
-                    android:gravity="left|center_vertical"
-                    android:text="here it is" />
+                    android:layout_marginRight="5dp"
+                    android:gravity="center"
+                    android:text="@string/testvalue" />
 
             </LinearLayout>
         </LinearLayout>

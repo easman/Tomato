@@ -47,7 +47,7 @@
                 android:textSize="12sp" />
 
             <TextView
-                android:id="@+id/card_totle_tomato_repeat"
+                android:id="@+id/card_totle_pomodori_repeat"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="3dp"
@@ -67,10 +67,10 @@
             android:background="#ffd2c9">
 
             <ImageView
-                android:id="@+id/tomato_image"
+                android:id="@+id/pomodori_image"
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_tomato_0"
+                android:src="@drawable/ic_pomodori_0"
                 android:gravity="center"
                 android:padding="15dp" />
 

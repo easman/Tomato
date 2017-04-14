@@ -10,7 +10,7 @@
     tools:showIn="@layout/app_bar_face">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/tomato_list"
+        android:id="@+id/pomodori_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="5dp"

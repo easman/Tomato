@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 import com.echo.anothertest.R;
 import com.echo.anothertest.utils.SerializableHelper;
-import com.echo.anothertest.bean.Tomato;
+import com.echo.anothertest.bean.Pomodori;
 
 import java.text.DecimalFormat;
 import java.util.Timer;
@@ -40,10 +40,10 @@ public class AlarmActivity extends Activity {
     private static final int BREAK_TIME_SITUATION = 11;
 
     //载入数据参数
-    private Tomato tomato;
+    private Pomodori pomodori;
     private int workMinutes;
     private int breakMinutes;
-    private int totleTomatoRepeat;
+    private int totlePomodoriRepeat;
     private int numberOfFinish;
     private int numberOfUnfinish;
     private String jobDescription;
@@ -54,7 +54,7 @@ public class AlarmActivity extends Activity {
     //运行中调用参数
     private int mTotalProgress;
     private int mCurrentProgress;
-    private double currentTomatoNumber;
+    private double currentPomodoriNumber;
     private int currentSituation;
     private boolean isRunning;
     private boolean isTouchPause;
@@ -91,13 +91,13 @@ public class AlarmActivity extends Activity {
         registerReceiver(screenTurnOnReceiver, screenTurnOnIntentFilter);
         registerReceiver(screenTurnOffReceiver, screenTurnOffIntentFilter);
 
-        //提取intent中的tomato对象
+        //提取intent中的Pomodori对象
         Intent intent = getIntent();
-        String tomatoString = intent.getStringExtra("tomato");
-        tomato = SerializableHelper.getTomatoFromShare(tomatoString);
+        String PomodoriString = intent.getStringExtra("pomodori");
+        pomodori = SerializableHelper.getPomodoriFromShare(PomodoriString);
 
         //初始化
-        initVariable(tomato);
+        initVariable(pomodori);
         initView();
 
         //数据格式化
@@ -211,20 +211,20 @@ public class AlarmActivity extends Activity {
     /*
     数据初始化方法
      */
-    private void initVariable(Tomato tomato) {
-        workMinutes = tomato.getWorkMinutes() * 1000 * 60;
-        breakMinutes = tomato.getBreakMinutes() * 1000 * 60;
-        totleTomatoRepeat = tomato.getTotleTamatoRepeat();
-        jobDescription = tomato.getJobDescription();
-        numberOfFinish = tomato.getNumberOfFinish();
-        numberOfUnfinish = tomato.getNumberOfUnfinish();
-        isSound = tomato.isSound();
-        isWave = tomato.isWave();
+    private void initVariable(Pomodori pomodori) {
+        workMinutes = pomodori.getWorkMinutes() * 1000 * 60;
+        breakMinutes = pomodori.getBreakMinutes() * 1000 * 60;
+        totlePomodoriRepeat = pomodori.getTotlePomodoriRepeat();
+        jobDescription = pomodori.getJobDescription();
+        numberOfFinish = pomodori.getNumberOfFinish();
+        numberOfUnfinish = pomodori.getNumberOfUnfinish();
+        isSound = pomodori.isSound();
+        isWave = pomodori.isVibrate();
 
         isRunning = false;
         isTouchPause = false;
         screenOn = true;
-        currentTomatoNumber = 0;
+        currentPomodoriNumber = 0;
         currentSituation = WORK_TIME_SITUATION;
         mTotalProgress = workMinutes;
         mCurrentProgress = 0;
@@ -258,7 +258,7 @@ public class AlarmActivity extends Activity {
         tx2.setVisibility(View.INVISIBLE);
 
         //番茄执行进度
-        txNumber.setText((int) (currentTomatoNumber + 1) + "个番茄/" + totleTomatoRepeat + "个番茄");
+        txNumber.setText((int) (currentPomodoriNumber + 1) + "个番茄/" + totlePomodoriRepeat + "个番茄");
 
         //倒计时显示
         df.applyPattern("00");
@@ -315,16 +315,16 @@ public class AlarmActivity extends Activity {
         final MediaPlayer mediaPlayer;
         final Vibrator vib = (Vibrator) getSystemService(Service.VIBRATOR_SERVICE);
 
-        currentTomatoNumber += 0.5;
+        currentPomodoriNumber += 0.5;
 
         //判断当前执行的是工作还是休息状态
         if (currentSituation == WORK_TIME_SITUATION) {
 
             //更新番茄个数
-            txNumber.setText((int) (currentTomatoNumber + 1) + "个番茄/" + totleTomatoRepeat + "个番茄");
+            txNumber.setText((int) (currentPomodoriNumber + 1) + "个番茄/" + totlePomodoriRepeat + "个番茄");
 
             //判断是否已经完成番茄
-            if (totleTomatoRepeat - 1 == (int) currentTomatoNumber) {
+            if (totlePomodoriRepeat - 1 == (int) currentPomodoriNumber) {
 
                 //震动和铃音
                 mediaPlayer = MediaPlayer.create(getBaseContext(), R.raw.break_sound);
@@ -343,7 +343,7 @@ public class AlarmActivity extends Activity {
                             mediaPlayer.release();
                         }
                         vib.cancel();
-                        endTomato();
+                        endPomodori();
                     }
                 }).show();
             } else {
@@ -399,7 +399,7 @@ public class AlarmActivity extends Activity {
             }).show();
 
             // 更新数据
-            txNumber.setText((int) (currentTomatoNumber + 1) + "个番茄/" + totleTomatoRepeat + "个番茄");
+            txNumber.setText((int) (currentPomodoriNumber + 1) + "个番茄/" + totlePomodoriRepeat + "个番茄");
             currentSituation = WORK_TIME_SITUATION;
             mTotalProgress = workMinutes;
             mTasksView.setmTotalProgress(mTotalProgress);
@@ -412,25 +412,25 @@ public class AlarmActivity extends Activity {
     /*
     番茄终止时的处理方法
      */
-    private void endTomato() {
+    private void endPomodori() {
 
-        //对tomato对象标记完成状况
-        if (currentTomatoNumber == (double) totleTomatoRepeat - 0.5) {
+        //对Pomodori对象标记完成状况
+        if (currentPomodoriNumber == (double) totlePomodoriRepeat - 0.5) {
             numberOfFinish++;
-            tomato.setNumberOfFinish(numberOfFinish);
+            pomodori.setNumberOfFinish(numberOfFinish);
         } else {
             numberOfUnfinish++;
-            tomato.setNumberOfUnfinish(numberOfUnfinish);
+            pomodori.setNumberOfUnfinish(numberOfUnfinish);
         }
 
         //记录响铃和震动设置
-        tomato.setSound(isSound);
-        tomato.setWave(isWave);
+        pomodori.setSound(isSound);
+        pomodori.setVibrate(isWave);
 
-        //序列化tomato对象
-        String tomatoString = SerializableHelper.setTomatoToShare(tomato);
+        //序列化Pomodori对象
+        String pomodoriString = SerializableHelper.setPomodoriToShare(pomodori);
         Intent intent = new Intent();
-        intent.putExtra("tomato_back", tomatoString);
+        intent.putExtra("pomodori_back", pomodoriString);
 
         //通过Intent对象返回结果，调用setResult方法
         setResult(RESULT_OK, intent);
@@ -472,7 +472,7 @@ public class AlarmActivity extends Activity {
                     new AlertDialog.Builder(AlarmActivity.this).setCancelable(false).setMessage("你确定要结束这个番茄吗").setPositiveButton("结束番茄", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            endTomato();
+                            endPomodori();
                         }
                     }).setNegativeButton("继续工作", new DialogInterface.OnClickListener() {
                         @Override
