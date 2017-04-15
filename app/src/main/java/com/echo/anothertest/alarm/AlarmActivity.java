@@ -110,16 +110,6 @@ public class AlarmActivity extends Activity {
         isRunning = true;
         startTimer();
 
-//        //设置txStart监听器
-//        txStart.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (txStartHasNotClicked) {
-//
-//                }
-//            }
-//        });
-
         //设置继续按钮监听器
         tx1.setOnClickListener(new View.OnClickListener() {
             @Override
