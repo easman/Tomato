@@ -56,10 +56,10 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center_vertical|start"
-                    android:text="@string/jopDescriptionCN" />
+                    android:text="@string/pomodoriNameCN" />
 
                 <EditText
-                    android:id="@+id/input_job_description"
+                    android:id="@+id/input_pomodori_ame"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center"
@@ -244,10 +244,10 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center_vertical|start"
-                    android:text="@string/waveCN" />
+                    android:text="@string/vibrateCN" />
 
                 <Switch
-                    android:id="@+id/switch_wave"
+                    android:id="@+id/switch_vibrate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 

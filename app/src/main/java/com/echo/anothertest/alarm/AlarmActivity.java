@@ -46,8 +46,8 @@ public class AlarmActivity extends Activity {
     private int totlePomodoriRepeat;
     private int numberOfFinish;
     private int numberOfUnfinish;
-    private String jobDescription;
-    private boolean isSound, isWave;
+    private String pomodoriName;
+    private boolean isSound, isVibrate;
     private boolean screenOn;
 
 
@@ -61,7 +61,7 @@ public class AlarmActivity extends Activity {
 
     private TasksCompletedView mTasksView;
     private TextView tx1, tx2, txStart, txNumber, txCounter;
-    private ImageView soundClicker, waveClicker;
+    private ImageView soundClicker, vibrateClicker;
 
     private Timer timer = new Timer();
     private TimerTask timerTask = null;
@@ -106,7 +106,7 @@ public class AlarmActivity extends Activity {
 
         //载入后直接开始计时初始化
         tx2.setVisibility(View.VISIBLE);
-        txStart.setText(jobDescription);
+        txStart.setText(pomodoriName);
         isRunning = true;
         startTimer();
 
@@ -175,15 +175,15 @@ public class AlarmActivity extends Activity {
             }
         });
 
-        waveClicker.setOnClickListener(new View.OnClickListener() {
+        vibrateClicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isWave) {
-                    waveClicker.setImageResource(R.drawable.ic_unwave);
-                    isWave = false;
+                if (isVibrate) {
+                    vibrateClicker.setImageResource(R.drawable.ic_unvibrate);
+                    isVibrate = false;
                 } else {
-                    waveClicker.setImageResource(R.drawable.ic_wave);
-                    isWave = true;
+                    vibrateClicker.setImageResource(R.drawable.ic_vibrate);
+                    isVibrate = true;
                 }
             }
         });
@@ -215,11 +215,11 @@ public class AlarmActivity extends Activity {
         workMinutes = pomodori.getWorkMinutes() * 1000 * 60;
         breakMinutes = pomodori.getBreakMinutes() * 1000 * 60;
         totlePomodoriRepeat = pomodori.getTotlePomodoriRepeat();
-        jobDescription = pomodori.getJobDescription();
+        pomodoriName = pomodori.getPomodoriName();
         numberOfFinish = pomodori.getNumberOfFinish();
         numberOfUnfinish = pomodori.getNumberOfUnfinish();
         isSound = pomodori.isSound();
-        isWave = pomodori.isVibrate();
+        isVibrate = pomodori.isVibrate();
 
         isRunning = false;
         isTouchPause = false;
@@ -241,17 +241,17 @@ public class AlarmActivity extends Activity {
         txNumber = (TextView) findViewById(R.id.txNumber);
         txCounter = (TextView) findViewById(R.id.txCounter);
         soundClicker = (ImageView) findViewById(R.id.soundClicker);
-        waveClicker = (ImageView) findViewById(R.id.waveClicker);
+        vibrateClicker = (ImageView) findViewById(R.id.vibrateClicker);
         if (isSound) {
             soundClicker.setImageResource(R.drawable.ic_sound);
         } else {
             soundClicker.setImageResource(R.drawable.ic_mute);
         }
-        waveClicker = (ImageView) findViewById(R.id.waveClicker);
-        if (isWave) {
-            waveClicker.setImageResource(R.drawable.ic_wave);
+        vibrateClicker = (ImageView) findViewById(R.id.vibrateClicker);
+        if (isVibrate) {
+            vibrateClicker.setImageResource(R.drawable.ic_vibrate);
         } else {
-            waveClicker.setImageResource(R.drawable.ic_unwave);
+            vibrateClicker.setImageResource(R.drawable.ic_unvibrate);
         }
 
         tx1.setVisibility(View.INVISIBLE);
@@ -331,7 +331,7 @@ public class AlarmActivity extends Activity {
                 if (isSound) {
                     mediaPlayer.start();
                 }
-                if (isWave) {
+                if (isVibrate) {
                     long[] lg = new long[]{700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300};
                     vib.vibrate(lg, -1);
                 }
@@ -353,7 +353,7 @@ public class AlarmActivity extends Activity {
                 if (isSound) {
                     mediaPlayer.start();
                 }
-                if (isWave) {
+                if (isVibrate) {
                     long[] lg = new long[]{700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300};
                     vib.vibrate(lg, -1);
                 }
@@ -383,7 +383,7 @@ public class AlarmActivity extends Activity {
             if (isSound) {
                 mediaPlayer.start();
             }
-            if (isWave) {
+            if (isVibrate) {
                 long[] lg = new long[]{700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300};
                 vib.vibrate(lg, -1);
             }
@@ -404,7 +404,7 @@ public class AlarmActivity extends Activity {
             mTotalProgress = workMinutes;
             mTasksView.setmTotalProgress(mTotalProgress);
             mCurrentProgress = 0;
-            txStart.setText(jobDescription);
+            txStart.setText(pomodoriName);
             startTimer();
         }
     }
@@ -425,7 +425,7 @@ public class AlarmActivity extends Activity {
 
         //记录响铃和震动设置
         pomodori.setSound(isSound);
-        pomodori.setVibrate(isWave);
+        pomodori.setVibrate(isVibrate);
 
         //序列化Pomodori对象
         String pomodoriString = SerializableHelper.setPomodoriToShare(pomodori);

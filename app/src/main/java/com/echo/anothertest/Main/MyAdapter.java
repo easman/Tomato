@@ -38,6 +38,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
     @Override
     public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+
         // 给ViewHolder设置布局文件
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.pomodori_image_car_view, viewGroup, false);
         return new ViewHolder(v);
@@ -45,11 +46,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(MyAdapter.ViewHolder viewHolder, int position) {
+
         // 给ViewHolder设置元素
         Pomodori t = pomodoris.get(position);
         viewHolder.mTextWorkMinutes.setText("工作" + t.getWorkMinutes() + "分钟");
         viewHolder.mTextBreakMinutes.setText("休息" + t.getBreakMinutes() + "分钟");
-        viewHolder.mTextJobDecription.setText(t.getJobDescription());
+        viewHolder.mTextPomodoriName.setText(t.getPomodoriName());
         viewHolder.mTextTotleTamatoRepeat.setText(t.getTotlePomodoriRepeat() + "个番茄");
         viewHolder.mTextNumberOfFinish.setText("已完成" + t.getNumberOfFinish() + "次");
         viewHolder.mTextNumberOfUnfinish.setText("未完成" + t.getNumberOfUnfinish() + "次");
@@ -80,13 +82,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
     // 重写的自定义ViewHolder
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView mTextWorkMinutes, mTextJobDecription, mTextBreakMinutes, mTextTotleTamatoRepeat, mTextNumberOfFinish, mTextNumberOfUnfinish;
+        public TextView mTextWorkMinutes, mTextPomodoriName, mTextBreakMinutes, mTextTotleTamatoRepeat, mTextNumberOfFinish, mTextNumberOfUnfinish;
         public ImageView pomodoriImage;
 
         public ViewHolder(View v) {
             super(v);
             mTextWorkMinutes = (TextView) v.findViewById(R.id.card_work_minutes);
-            mTextJobDecription = (TextView) v.findViewById(R.id.job_decription);
+            mTextPomodoriName = (TextView) v.findViewById(R.id.pomodori_name);
             mTextBreakMinutes = (TextView) v.findViewById(R.id.card_break_minutes);
             mTextTotleTamatoRepeat = (TextView) v.findViewById(R.id.card_totle_pomodori_repeat);
             mTextNumberOfFinish = (TextView) v.findViewById(R.id.number_of_finish);

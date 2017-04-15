@@ -87,7 +87,7 @@
     <string name="start_pomodori">开始番茄</string>
     <string name="card_list">cardList</string>
     <string name="input_hint">最多输入八个汉字</string>
-    <string name="jopDescriptionCN">任务名称</string>
+    <string name="pomodoriNameCN">任务名称</string>
     <string name="useDefaultSettingCN">使用默认设置</string>
     <string name="creatCN">创建</string>
     <string name="workMinutesCN">番茄时长</string>
@@ -98,7 +98,7 @@
     <string name="pomodoriRepeatCN">番茄个数</string>
     <string name="defaultPomodoriRepeatNumber">4个</string>
     <string name="soundCN">声音</string>
-    <string name="waveCN">震动</string>
+    <string name="vibrateCN">震动</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="testvalue">here it is</string>

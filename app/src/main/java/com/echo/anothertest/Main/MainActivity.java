@@ -268,13 +268,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //初始化item
-        final EditText inputJobDescription = (EditText) contentViewPop.findViewById(R.id.input_job_description);
+        final EditText inputPomodoriName = (EditText) contentViewPop.findViewById(R.id.input_pomodori_ame);
         final EditText inputWorkMinutes = (EditText) contentViewPop.findViewById(R.id.input_work_minutes);
         final EditText inputBreakMinutes = (EditText) contentViewPop.findViewById(R.id.input_break_minutes);
         final SeekBar seekPomodoriRepeat = (SeekBar) contentViewPop.findViewById(R.id.seek_pomodori_repeat);
         final TextView showPomodoriRepeat = (TextView) contentViewPop.findViewById(R.id.show_pomodori_repeat);
         final Switch switchSound = (Switch) contentViewPop.findViewById(R.id.switch_sound);
-        final Switch switchWave = (Switch) contentViewPop.findViewById(R.id.switch_wave);
+        final Switch switchVibrate = (Switch) contentViewPop.findViewById(R.id.switch_vibrate);
         TextView creatPomodori = (TextView) contentViewPop.findViewById(R.id.click_to_creat_pomodori);
         Switch switchDefaultSetting = (Switch) contentViewPop.findViewById(R.id.switch_default_setting);
 
@@ -284,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //检查空值
                 StringBuffer sbf = new StringBuffer();
-                if (inputJobDescription.getText().toString().length() == 0) {
+                if (inputPomodoriName.getText().toString().length() == 0) {
                     sbf.append("任务名称，");
                 }
                 if (inputWorkMinutes.getText().toString().length() == 0) {
@@ -302,9 +302,9 @@ public class MainActivity extends AppCompatActivity {
                     Pomodori currentPomodori = new Pomodori(Integer.parseInt(inputWorkMinutes.getText().toString()),
                             Integer.parseInt(inputBreakMinutes.getText().toString()),
                             seekPomodoriRepeat.getProgress() + 1,
-                            inputJobDescription.getText().toString(),
+                            inputPomodoriName.getText().toString(),
                             switchSound.isChecked(),
-                            switchWave.isChecked());
+                            switchVibrate.isChecked());
                     pomodoris.add(currentPomodori);
                     savePomodoriList();
                     mRecyclerView.scrollToPosition(myAdapter.getItemCount() - 1);
@@ -402,8 +402,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //设置是否震动
-        switchWave.setChecked(false);
-        switchWave.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        switchVibrate.setChecked(false);
+        switchVibrate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 

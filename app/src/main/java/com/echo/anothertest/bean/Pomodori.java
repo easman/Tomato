@@ -11,18 +11,18 @@ public class Pomodori implements Serializable {
     private int workMinutes;
     private int breakMinutes;
     private int totlePomodoriRepeat;
-    private String jobDescription;
+    private String pomodoriName;
     private int numberOfFinish;
     private int numberOfUnfinish;
     private boolean existSituation;
     private boolean isSound = true;
     private boolean isVibrate = true;
 
-    public Pomodori(int workMinutes, int breakMinutes, int totlePomodoriRepeat, String jobDescription, boolean isSound, boolean isVibrate) {
+    public Pomodori(int workMinutes, int breakMinutes, int totlePomodoriRepeat, String pomodoriName, boolean isSound, boolean isVibrate) {
         this.breakMinutes = breakMinutes;
         this.workMinutes = workMinutes;
         this.totlePomodoriRepeat = totlePomodoriRepeat;
-        this.jobDescription = jobDescription;
+        this.pomodoriName = pomodoriName;
         this.numberOfFinish = 0;
         this.numberOfUnfinish = 0;
         this.isSound = isSound;
@@ -71,12 +71,12 @@ public class Pomodori implements Serializable {
         this.totlePomodoriRepeat = totlePomodoriRepeat;
     }
 
-    public String getJobDescription() {
-        return jobDescription;
+    public String getPomodoriName() {
+        return pomodoriName;
     }
 
-    public void setJobDescription(String jobDescription) {
-        this.jobDescription = jobDescription;
+    public void setPomodoriName(String pomodoriName) {
+        this.pomodoriName = pomodoriName;
     }
 
     public int getNumberOfFinish() {
